@@ -1,0 +1,52 @@
+name: Deploy to Yandex Object Storage
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.YC_S3_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.YC_S3_SECRET }}
+  AWS_DEFAULT_REGION: ru-central1
+  ENDPOINT: https://storage.yandexcloud.net
+  BUCKET: ${{ secrets.YC_BUCKET }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1) Все ассеты (видео, картинки, стабы) — кэш на сутки, чистим удалённое
+      - name: Sync assets
+        run: |
+          aws s3 sync . "s3://$BUCKET" \
+            --endpoint-url "$ENDPOINT" \
+            --delete \
+            --cache-control "public, max-age=86400" \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude ".claude/*" \
+            --exclude ".gitignore" \
+            --exclude "README.md" \
+            --exclude "DEPLOY.md" \
+            --exclude "deploy.sh" \
+            --exclude "*.DS_Store" \
+            --exclude "*.html"
+
+      # 2) HTML — без кэша, чтобы обновления были видны сразу
+      - name: Sync HTML (no-cache)
+        run: |
+          aws s3 sync . "s3://$BUCKET" \
+            --endpoint-url "$ENDPOINT" \
+            --cache-control "no-cache" \
+            --content-type "text/html; charset=utf-8" \
+            --exclude "*" \
+            --include "*.html" \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude ".claude/*"
+
+      - name: Done
+        run: echo "✅ Задеплоено в http://$BUCKET.website.yandexcloud.net"

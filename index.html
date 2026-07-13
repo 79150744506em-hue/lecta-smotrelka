@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Смотрелка — прототип</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#7B61FF;
+  --brand-ink:#5B44C8;
+  --grad:linear-gradient(90deg,#7B61FF 0%,#9C6BEE 100%);
+  --grad-quiz:linear-gradient(180deg,#8A78E8 0%,#A091EE 55%,#B4A7F3 100%);
+  --ink:#16121F;
+  --ink-2:#6A6577;
+  --ink-3:#9E99AC;
+  --line:#EDEBF2;
+  --card:#FFFFFF;
+  --bg:#FFFFFF;
+  --lav:#F2EFFC;
+  --ok-bg:#CDEBD3; --ok-ink:#2E9E52;
+  --no-bg:#F7CFC7; --no-ink:#D5544A;
+  --radius:22px;
+  --shadow:0 10px 30px rgba(40,20,90,.08);
+  --shadow-lg:0 20px 50px rgba(40,20,90,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:#DDD9E4;
+  background:radial-gradient(120% 120% at 50% 0%,#E9E6EF 0%,#D6D2DE 100%);
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:24px;color:var(--ink);
+}
+h1,h2,h3,.head{font-family:'Nunito',sans-serif}
+
+/* ===== device ===== */
+.device{
+  position:relative;width:390px;height:844px;flex:0 0 auto;
+  background:#000;border-radius:56px;padding:12px;
+  box-shadow:0 40px 80px rgba(30,15,60,.35),0 0 0 2px #222 inset;
+}
+.screen{
+  position:relative;width:100%;height:100%;
+  background:var(--bg);border-radius:44px;overflow:hidden;
+}
+.notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:20px;z-index:60;pointer-events:none}
+
+/* status bar */
+.statusbar{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:16px 30px 0;font-size:15px;font-weight:700;font-family:'Nunito';z-index:55;pointer-events:none;color:var(--ink)}
+.statusbar.light{color:#fff}
+.statusbar .r{display:flex;gap:7px;align-items:center}
+.statusbar svg{display:block}
+
+/* pages */
+.page{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg)}
+.page.active{display:flex}
+.page-scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.page-scroll::-webkit-scrollbar{width:0}
+
+/* tabbar */
+.tabbar{height:82px;flex:0 0 auto;background:#fff;border-top:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-around;padding:9px 8px 0;position:relative;z-index:30}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:#B7B3C2;flex:1;cursor:pointer;font-family:'Nunito'}
+.tab svg{width:26px;height:26px}
+.tab.active{color:var(--brand)}
+.tab.center{margin-top:-4px}
+.tab.center .cbtn{width:52px;height:52px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px rgba(123,97,255,.45);margin-bottom:1px}
+.tab.center .cbtn svg{width:28px;height:28px}
+.tab.center.active{color:var(--brand)}
+
+/* buttons */
+.btn{border:none;font-family:'Nunito';font-weight:800;cursor:pointer;border-radius:20px;font-size:17px}
+.btn-primary{background:var(--grad);color:#fff;height:58px;width:100%;box-shadow:0 12px 26px rgba(123,97,255,.4);display:flex;align-items:center;justify-content:center;gap:9px}
+.btn-primary:active{transform:translateY(1px)}
+.btn-ghost{background:#F3F1F8;color:var(--ink);height:56px;width:100%}
+.floating{position:absolute;left:0;right:0;bottom:0;padding:14px 18px calc(14px + 82px);pointer-events:none;z-index:25;background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.9) 42%,#fff 70%)}
+.floating .btn{pointer-events:auto}
+
+/* ===== HOME ===== */
+.home-head{padding:64px 20px 12px;display:flex;align-items:center;justify-content:space-between}
+.home-head h1{font-size:34px;font-weight:900;letter-spacing:-.5px}
+.icon-btn{width:42px;height:42px;border-radius:50%;background:#F3F1F8;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:var(--ink)}
+.banner{margin:6px 20px 20px;border-radius:24px;padding:22px;background:linear-gradient(120deg,#EDE7FF,#F6ECFF);position:relative;overflow:hidden}
+.banner .tag{display:inline-block;background:#fff;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--brand-ink);margin-bottom:10px;font-family:'Nunito'}
+.banner h3{font-size:20px;font-weight:900;line-height:1.15;max-width:70%}
+.banner .blob{position:absolute;right:-10px;bottom:-20px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#C9B7FF,#9C7BF0)}
+.sec-title{padding:2px 20px 12px;display:flex;align-items:center;justify-content:space-between}
+.sec-title h2{font-size:22px;font-weight:900}
+.sec-title a{color:var(--brand);font-weight:800;font-size:14px;font-family:'Nunito';cursor:pointer}
+.hcards{display:flex;gap:14px;overflow-x:auto;padding:0 20px 18px}
+.hcards::-webkit-scrollbar{height:0}
+.hstrip{overflow-x:auto;padding:0 0 14px 20px}
+.hstrip::-webkit-scrollbar{height:0}
+.hstrip img{width:452px;max-width:none;height:auto;display:block;cursor:pointer}
+.hcard{flex:0 0 150px;cursor:pointer}
+.hcard .thumb{height:170px;border-radius:18px;background:linear-gradient(160deg,#DDE9FF,#EAD9FF);position:relative;display:flex;align-items:flex-end;padding:12px;font-family:'Nunito';font-weight:900;font-size:26px;color:#5a4bb8}
+.hcard.c2 .thumb{background:linear-gradient(160deg,#FFE1EC,#FFD9C7)}
+.hcard.c3 .thumb{background:linear-gradient(160deg,#D8F5E6,#CFEFFF)}
+.hcard .name{font-size:14px;font-weight:700;margin-top:8px;line-height:1.25;font-family:'Nunito'}
+.hcard .price{display:inline-block;margin-top:6px;background:var(--brand);color:#fff;font-size:13px;font-weight:800;padding:5px 10px;border-radius:12px;font-family:'Nunito'}
+
+/* ===== MAIN (Смотрелка) ===== */
+.mhead{padding:60px 20px 8px;display:flex;align-items:center;justify-content:space-between}
+.mhead h1{font-size:30px;font-weight:900;letter-spacing:-.5px}
+.mhead .actions{display:flex;gap:10px}
+.filters{margin:10px 18px 8px;background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.filter-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer}
+.filter-row+.filter-row{border-top:1px solid var(--line)}
+.filter-row .lbl{font-size:13px;color:var(--ink-3);font-weight:600;font-family:'Nunito'}
+.filter-row .val{font-size:17px;font-weight:800;font-family:'Nunito';margin-top:2px}
+.filter-row .chev{color:var(--ink-3)}
+.theme-list{padding:6px 18px 0}
+.theme-card{display:flex;align-items:center;gap:14px;padding:16px 4px;cursor:pointer;position:relative}
+.theme-card+.theme-card{border-top:1px solid var(--line)}
+.theme-ic{width:56px;height:56px;border-radius:18px;flex:0 0 auto;background:#F2F0F8;display:flex;align-items:center;justify-content:center;color:#C6C1D6}
+.theme-ic.started{background:#EEE9FF;color:var(--brand)}
+.theme-ic.done{background:#E3F7EA;color:var(--ok-ink)}
+.theme-main{flex:1;min-width:0}
+.theme-main h3{font-size:16.5px;font-weight:800;font-family:'Nunito';line-height:1.2}
+.theme-main .sub{font-size:13px;color:var(--ink-3);margin-top:3px;font-weight:500}
+.prog{display:flex;align-items:center;gap:10px;margin-top:9px}
+.prog .bar{flex:1;height:7px;border-radius:6px;background:#EDEBF2;overflow:hidden}
+.prog .bar span{display:block;height:100%;border-radius:6px;background:var(--grad);width:0}
+.prog .pct{font-size:12px;font-weight:800;color:var(--ink-2);font-family:'Nunito';min-width:34px;text-align:right}
+.theme-card .go{color:var(--ink-3);flex:0 0 auto}
+.empty{padding:60px 30px;text-align:center;color:var(--ink-3)}
+.empty .em{font-size:54px;margin-bottom:12px}
+.empty h3{font-family:'Nunito';font-size:19px;color:var(--ink-2);margin-bottom:6px}
+
+/* ===== THEME screen ===== */
+.subhead{position:relative;padding:56px 16px 6px;display:flex;align-items:center;justify-content:center}
+.subhead .back{position:absolute;left:14px;top:52px;width:40px;height:40px;border-radius:50%;background:#F3F1F8;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:var(--ink)}
+.subhead .t{font-size:15px;font-weight:800;font-family:'Nunito';color:var(--ink-2);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.theme-hero{padding:6px 20px 4px}
+.theme-hero h1{font-size:27px;font-weight:900;letter-spacing:-.4px;line-height:1.1}
+.theme-hero .meta{font-size:14px;color:var(--ink-3);margin-top:8px;font-weight:600}
+.theme-hero .prog{margin-top:14px}
+.lessons{padding:14px 18px 0}
+.lesson{display:flex;align-items:center;gap:14px;padding:10px 0;cursor:pointer}
+.lesson .lvid{width:76px;height:76px;border-radius:18px;flex:0 0 auto;overflow:hidden;position:relative;background:#1c1830}
+.lesson .lvid video,.lesson .lvid img{width:100%;height:100%;object-fit:cover;object-position:50% 14%;display:block}
+.lesson .lvid .num{position:absolute;left:7px;top:6px;font-family:'Nunito';font-weight:900;font-size:13px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);z-index:2}
+.lesson .lvid .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;opacity:.95}
+.lesson .lvid .play svg{filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}
+.lesson.done .lvid::after{content:"";position:absolute;inset:0;background:rgba(20,10,40,.55)}
+.lesson .lok{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:3;color:#fff}
+.lesson.done .lok{display:flex}
+.lesson-main{flex:1;min-width:0}
+.lesson-main .k{font-size:12px;color:var(--brand);font-weight:800;font-family:'Nunito';text-transform:uppercase;letter-spacing:.4px}
+.lesson-main h3{font-size:16px;font-weight:800;font-family:'Nunito';line-height:1.2;margin-top:2px}
+.lesson-main .st{font-size:12.5px;color:var(--ink-3);margin-top:3px;font-weight:600;display:flex;align-items:center;gap:5px}
+.lesson.done .lesson-main .st{color:var(--ok-ink)}
+.lesson .go{color:var(--ink-3)}
+
+/* ===== VIDEO ===== */
+#screen-video .page-scroll,#screen-video{background:#000}
+.videoWrap{position:absolute;inset:0;background:#000;overflow:hidden}
+.videoWrap video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:1}
+.vblur{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(26px) brightness(.6);transform:scale(1.3)}
+#screen-video .tabbar{position:absolute;bottom:0;left:0;right:0;z-index:20}
+.vtop{position:absolute;top:52px;left:14px;z-index:24}
+.vtopright{position:absolute;top:52px;right:14px;z-index:24}
+.sound-hint{position:absolute;top:56px;left:50%;transform:translateX(-50%);z-index:24;background:rgba(0,0,0,.42);backdrop-filter:blur(6px);color:#fff;font-family:'Nunito';font-weight:800;font-size:13px;padding:9px 14px;border-radius:20px;cursor:pointer;display:none;white-space:nowrap}
+.sound-hint.show{display:block;animation:fade .3s ease}
+.vtop .back{width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.32);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;color:#fff;border:none;cursor:pointer}
+.vactions{position:absolute;right:12px;bottom:310px;z-index:24;display:flex;flex-direction:column;gap:18px;align-items:center;opacity:0;pointer-events:none;transform:translateX(12px);transition:opacity .22s ease,transform .22s ease}
+#screen-video.showctl .vactions{opacity:1;pointer-events:auto;transform:none}
+.vplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.6);z-index:23;width:82px;height:82px;border-radius:50%;background:rgba(20,12,40,.5);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;color:#fff;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+#screen-video.showctl .vplay{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto;cursor:pointer}
+.vact{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.vact .ic{width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.34);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;color:#fff;transition:.15s}
+.vact.on .ic{background:var(--brand);color:#fff}
+.vact.on.dis .ic{background:#E24B6A}
+.vact span{font-size:11px;color:#fff;font-weight:700;font-family:'Nunito';text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.vtitle{position:absolute;left:18px;right:18px;bottom:104px;z-index:21;color:#fff;font-size:15px;font-weight:800;font-family:'Nunito';text-shadow:0 1px 6px rgba(0,0,0,.75);opacity:0;transform:translateY(6px);transition:opacity .22s ease,transform .22s ease;pointer-events:none}
+#screen-video.showctl .vtitle{opacity:1;transform:none}
+.vbar{position:absolute;left:18px;right:18px;bottom:92px;z-index:21;height:5px;border-radius:5px;background:rgba(255,255,255,.3);overflow:hidden}
+.vbar span{display:block;height:100%;background:#fff;width:0;border-radius:5px}
+.video-tap{position:absolute;left:0;right:0;top:0;bottom:82px;z-index:23;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(10,6,24,.4);color:#fff;cursor:pointer}
+.video-tap.show{display:flex;animation:fade .3s ease}
+.video-tap .pcirc{width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;color:#5B44C8;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.video-tap .lbl{font-family:'Nunito';font-weight:800;font-size:15px;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+.swipe-hint{position:absolute;left:0;right:0;top:0;bottom:82px;z-index:19;background:rgba(10,6,24,.5);display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#fff;cursor:pointer;backdrop-filter:blur(1px)}
+.swipe-hint.show{display:flex;animation:fade .3s ease}
+.swipe-hint .hand{font-size:40px;animation:up 1.1s ease-in-out infinite}
+.swipe-hint .txt{font-family:'Nunito';font-weight:800;font-size:19px;text-align:center;line-height:1.25}
+@keyframes up{0%,100%{transform:translateY(4px)}50%{transform:translateY(-8px)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+/* ===== GAME ===== */
+#screen-game{background:#8A78E8}
+.gamebg{position:absolute;inset:0;background:var(--grad-quiz)}
+.gamebg::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 50% -10%,rgba(255,255,255,.22),rgba(255,255,255,0))}
+.gtop{position:absolute;top:50px;left:0;right:0;z-index:12;display:flex;align-items:center;justify-content:center;padding:0 16px}
+.gtop .back{position:absolute;left:14px;top:-2px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;border:none;cursor:pointer}
+.gprog{text-align:center;color:#fff}
+.gprog .n{font-family:'Nunito';font-weight:900;font-size:19px;line-height:1}
+.gprog .seg{display:flex;gap:5px;justify-content:center;margin-top:7px}
+.gprog .seg i{width:22px;height:5px;border-radius:4px;background:rgba(255,255,255,.35)}
+.gprog .seg i.on{background:#fff}
+.garea{position:absolute;top:118px;left:0;right:0;bottom:0;z-index:10;padding:8px 20px 22px;display:flex;flex-direction:column;overflow-y:auto}
+.garea::-webkit-scrollbar{width:0}
+.qbubble{display:flex;align-items:center;gap:12px;background:#fff;border-radius:24px;padding:14px 18px 14px 14px;box-shadow:0 10px 24px rgba(40,20,90,.18)}
+.qbubble .m{width:58px;height:58px;flex:0 0 auto}
+.qbubble .qt{font-family:'Nunito';font-weight:800;font-size:16px;line-height:1.2;color:var(--ink)}
+.qmid{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px;min-height:0;padding:8px 0}
+.qimg{margin:0 auto;background:#fff;border-radius:22px;padding:12px;box-shadow:0 10px 24px rgba(40,20,90,.16);max-width:250px}
+.qimg img{width:100%;border-radius:12px;display:block}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ans{position:relative;background:var(--lav);border:none;border-radius:18px;min-height:66px;padding:12px;font-family:'Nunito';font-weight:800;font-size:14.5px;color:var(--brand-ink);cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.15;transition:.15s;box-shadow:0 4px 0 rgba(123,97,255,.12)}
+.ans:active{transform:translateY(1px)}
+.ans.img-ans{background:#fff;padding:10px;min-height:96px}
+.ans.img-ans img{max-height:74px;max-width:100%}
+.ans.correct{background:var(--ok-bg);color:var(--ok-ink)}
+.ans.wrong{background:var(--no-bg);color:var(--no-ink)}
+.ans.dim{opacity:.5}
+.ans[disabled]{cursor:default}
+.qhint{margin-top:12px;background:rgba(255,255,255,.9);border-radius:16px;padding:12px 14px;font-family:'Nunito';font-weight:700;font-size:13.5px;color:var(--ink-2);display:none}
+.qhint.show{display:block;animation:fade .3s}
+.gnext{margin-top:14px;display:none}
+.gnext.show{display:block;animation:fade .3s}
+.gnext .btn{background:#fff;color:#4A34B0;box-shadow:0 12px 26px rgba(20,10,60,.22)}
+
+/* match */
+.match-prompt{color:#fff;font-family:'Nunito';font-weight:800;font-size:15px;text-align:center;margin:4px 0 10px;opacity:.95}
+.match-legend{background:#fff;border-radius:16px;padding:8px;margin:0 auto 12px;max-width:230px;box-shadow:0 8px 20px rgba(40,20,90,.14)}
+.match-legend img{width:100%;border-radius:10px;display:block}
+.match-cols{display:flex;gap:12px;align-items:stretch}
+.mcol{flex:1;display:flex;flex-direction:column;gap:12px}
+.mitem{background:#fff;border-radius:16px;min-height:78px;padding:10px 12px;font-family:'Nunito';font-weight:800;font-size:13.5px;color:var(--ink);display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.15;cursor:pointer;border:2.5px solid transparent;transition:.15s;box-shadow:0 5px 14px rgba(40,20,90,.12)}
+.mitem.img{padding:8px}
+.mitem.img img{max-height:44px}
+.mitem.sel{border-color:var(--brand);box-shadow:0 0 0 4px rgba(123,97,255,.2)}
+.mitem.matched{border-color:var(--ok-ink);background:var(--ok-bg);color:var(--ok-ink);cursor:default}
+.mitem.matched.img{background:var(--ok-bg)}
+.mitem.flash{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* countdown */
+.countdown{position:absolute;inset:0;z-index:40;background:var(--grad-quiz);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.countdown.show{display:flex}
+.countdown .m{width:120px;height:130px}
+.countdown .c{font-family:'Nunito';font-weight:900;font-size:96px;color:#fff;text-shadow:0 8px 24px rgba(40,10,80,.3);animation:pop .5s ease}
+.countdown .cap{color:#fff;font-family:'Nunito';font-weight:800;font-size:18px;opacity:.95}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ===== overlays / sheets ===== */
+.scrim{position:absolute;inset:0;z-index:70;background:rgba(15,8,30,.5);display:none;align-items:flex-end;animation:fade .25s}
+.scrim.show{display:flex}
+.scrim.center{align-items:center;justify-content:center;padding:24px}
+.sheet{width:100%;background:#fff;border-radius:28px 28px 44px 44px;padding:10px 20px 30px;transform:translateY(0);animation:slideup .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes slideup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.grip{width:40px;height:5px;border-radius:3px;background:#E2DFEA;margin:8px auto 14px}
+.sheet h2{font-family:'Nunito';font-size:22px;font-weight:900;text-align:center;margin-bottom:16px}
+.opt{display:flex;align-items:center;justify-content:space-between;padding:16px 6px;cursor:pointer;font-family:'Nunito';font-weight:800;font-size:18px}
+.opt+.opt{border-top:1px solid var(--line)}
+.radio{width:24px;height:24px;border-radius:50%;border:2px solid #D8D4E2;flex:0 0 auto;display:flex;align-items:center;justify-content:center}
+.opt.sel .radio{border-color:var(--brand)}
+.opt.sel .radio::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--brand)}
+.sheet .btn-primary{margin-top:18px}
+
+/* report form */
+.report textarea{width:100%;height:120px;border:1.5px solid var(--line);border-radius:16px;padding:14px;font-family:'Inter';font-size:15px;resize:none;outline:none;margin-top:4px}
+.report textarea:focus{border-color:var(--brand)}
+.report .counter{text-align:right;font-size:12px;color:var(--ink-3);margin-top:6px;font-family:'Nunito';font-weight:700}
+
+/* result card */
+.result{background:#fff;border-radius:30px;padding:30px 24px 24px;text-align:center;width:100%;max-width:330px;box-shadow:var(--shadow-lg);animation:pop .4s ease}
+.result .m{width:120px;height:130px;margin:0 auto 6px}
+.result h2{font-family:'Nunito';font-size:25px;font-weight:900;line-height:1.1}
+.result p{color:var(--ink-2);font-size:14.5px;margin-top:8px;font-weight:500;line-height:1.4}
+.result .stars{display:flex;justify-content:center;gap:6px;margin:16px 0 4px;color:#FFC53D}
+.result .prog{margin:16px 4px 4px}
+.result .btns{margin-top:20px;display:flex;flex-direction:column;gap:10px}
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+.confetti i{position:absolute;top:-20px;width:9px;height:14px;border-radius:2px;opacity:.9;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(120vh) rotate(540deg);opacity:.4}}
+
+/* dopamine: correct-answer burst */
+.particle{position:absolute;width:8px;height:8px;border-radius:50%;z-index:26;pointer-events:none;animation:partfly .85s cubic-bezier(.15,.7,.3,1) forwards}
+@keyframes partfly{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.3);opacity:0}}
+@keyframes bounceM{0%,100%{transform:translateY(0) scale(1)}30%{transform:translateY(-9px) scale(1.14)}60%{transform:translateY(0) scale(.95)}}
+.ans.pop{animation:ansPop .45s ease}
+@keyframes ansPop{0%{transform:scale(1)}40%{transform:scale(1.05)}100%{transform:scale(1)}}
+.ans.shake{animation:ashake .42s}
+@keyframes ashake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.ans .ok-badge{position:absolute;top:-9px;right:-9px;width:27px;height:27px;border-radius:50%;background:#2E9E52;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;box-shadow:0 5px 12px rgba(46,158,82,.5);animation:badgePop .45s cubic-bezier(.2,1.5,.4,1)}
+@keyframes badgePop{0%{transform:scale(0)}100%{transform:scale(1)}}
+
+/* dopamine: final celebration */
+.result.final .m{animation:pop .4s ease, floatM 2.6s ease-in-out .4s infinite}
+@keyframes floatM{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.result.final .glow{position:absolute;left:50%;top:120px;width:220px;height:220px;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,197,61,.55),rgba(123,97,255,.15) 55%,transparent 70%);border-radius:50%;z-index:0;animation:glowPulse 2.4s ease-in-out infinite}
+@keyframes glowPulse{0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.9)}50%{opacity:.9;transform:translate(-50%,-50%) scale(1.12)}}
+.result.final>*{position:relative;z-index:1}
+.result .stars .star{transform:scale(0);animation:starPop .5s cubic-bezier(.2,1.6,.35,1) forwards}
+.result .stars .star:nth-child(1){animation-delay:.25s}
+.result .stars .star:nth-child(2){animation-delay:.45s}
+.result .stars .star:nth-child(3){animation-delay:.65s}
+@keyframes starPop{0%{transform:scale(0) rotate(-40deg)}70%{transform:scale(1.25) rotate(8deg)}100%{transform:scale(1) rotate(0)}}
+.result.sad .m{animation:sadIn .5s ease}
+@keyframes sadIn{0%{transform:scale(.7) translateY(6px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+
+/* toast */
+.toast{position:absolute;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);z-index:90;background:rgba(20,12,36,.92);color:#fff;padding:12px 20px;border-radius:16px;font-family:'Nunito';font-weight:700;font-size:14px;opacity:0;transition:.3s;pointer-events:none;max-width:300px;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* search */
+.searchbar{display:flex;align-items:center;gap:10px;background:#F3F1F8;border-radius:16px;padding:12px 14px;margin:56px 18px 8px}
+.searchbar input{border:none;background:none;outline:none;font-family:'Inter';font-size:16px;flex:1}
+.searchbar .cancel{color:var(--brand);font-weight:800;font-family:'Nunito';cursor:pointer;font-size:15px}
+
+/* ===== CHARACTER SELECT ===== */
+#screen-charselect{background:#171226}
+.cs-bg{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% -5%,#3f2c78 0%,#1c1533 55%,#120d22 100%)}
+.cs-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 40% at 80% 90%,rgba(240,107,192,.18),transparent 70%),radial-gradient(50% 40% at 15% 80%,rgba(90,200,250,.16),transparent 70%)}
+.cs-wrap{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;padding:78px 22px 28px;overflow-y:auto}
+.cs-wrap::-webkit-scrollbar{width:0}
+.cs-mascot{width:76px;height:84px;margin-bottom:12px;filter:drop-shadow(0 12px 26px rgba(140,110,255,.55))}
+.cs-title{font-family:'Nunito';font-weight:900;font-size:27px;color:#fff;text-align:center;letter-spacing:-.4px}
+.cs-sub{color:#B9B2D6;font-size:14px;text-align:center;margin:9px 0 26px;max-width:270px;line-height:1.45}
+.cs-grid{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;width:100%;max-width:340px}
+.cs-card{width:calc(50% - 7px);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:18px 12px 16px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;transition:transform .18s ease,background .18s ease;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.cs-card:hover{background:rgba(255,255,255,.12);transform:translateY(-3px)}
+.cs-card:active{transform:scale(.97)}
+.cs-av{position:relative;width:78px;height:78px;border-radius:50%;overflow:hidden;box-shadow:0 12px 26px rgba(0,0,0,.42);animation:floatM 3s ease-in-out infinite}
+.cs-av video,.cs-av img{width:100%;height:100%;object-fit:cover;object-position:50% 8%;display:block}
+.cs-badge{position:absolute;bottom:0;left:50%;transform:translateX(-50%);background:rgba(20,12,40,.82);color:#fff;font-family:'Nunito';font-weight:800;font-size:8.5px;letter-spacing:.4px;text-transform:uppercase;padding:2px 7px;border-radius:8px 8px 0 0}
+.cs-card:nth-child(2) .cs-av{animation-delay:.4s}.cs-card:nth-child(3) .cs-av{animation-delay:.8s}.cs-card:nth-child(4) .cs-av{animation-delay:1.2s}.cs-card:nth-child(5) .cs-av{animation-delay:1.6s}
+.cs-name{font-family:'Nunito';font-weight:800;font-size:16px;color:#fff}
+.cs-tag{font-size:11.5px;color:#B4AED0;margin-top:-5px}
+.cs-note{margin-top:auto;padding-top:24px;color:#8f89a8;font-size:12px;text-align:center;line-height:1.5}
+.cs-note b{color:#BBA6FF;font-family:'Nunito'}
+.char-chip{width:42px;height:42px;border-radius:50%;border:2px solid #fff;cursor:pointer;overflow:hidden;padding:0;box-shadow:0 6px 14px rgba(0,0,0,.16);background:var(--brand)}
+.char-chip video,.char-chip img{width:100%;height:100%;object-fit:cover;object-position:50% 8%;display:block}
+
+/* ===== адаптив: на телефоне — на весь экран, без рамки-мокапа ===== */
+@media (max-width:480px){
+  body{padding:0;background:#000;align-items:stretch}
+  .device{width:100vw;height:100vh;height:100dvh;max-width:none;border-radius:0;padding:0;box-shadow:none}
+  .screen{border-radius:0}
+  .notch,.statusbar{display:none}
+}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="notch"></div>
+  <div class="screen" id="screen">
+
+    <!-- ============ HOME ============ -->
+    <section class="page active" id="screen-home">
+      <div class="statusbar" data-clock><span>9:41</span><div class="r">
+        <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+        <svg width="17" height="12" viewBox="0 0 17 12"><path d="M8.5 2.5c2.3 0 4.4.9 6 2.4l-1.4 1.4A6.6 6.6 0 0 0 8.5 5.5 6.6 6.6 0 0 0 3.9 6.3L2.5 4.9A9 9 0 0 1 8.5 2.5Zm0 4a4.6 4.6 0 0 1 3.2 1.3l-1.4 1.4a2.6 2.6 0 0 0-3.6 0L5.3 7.8A4.6 4.6 0 0 1 8.5 6.5Zm0 3.4 1.5 1.5-1.5 1.5L7 11.4l1.5-1.5Z" fill="currentColor"/></svg>
+        <svg width="26" height="12" viewBox="0 0 26 12"><rect x="1" y="1" width="21" height="10" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/><rect x="3" y="3" width="16" height="6" rx="1.5" fill="currentColor"/><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+      </div></div>
+
+      <div class="page-scroll">
+        <div class="home-head">
+          <h1>Главная</h1>
+          <div style="display:flex;gap:10px;align-items:center">
+            <button class="char-chip" id="charAvatar" onclick="openCharSelect()" aria-label="Сменить персонажа"></button>
+            <button class="icon-btn" onclick="toast('Поиск по каталогу')" aria-label="Поиск">
+              <svg width="21" height="21" viewBox="0 0 21 21"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 14l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="banner">
+          <span class="tag">с 1 апреля по 30 сентября</span>
+          <h3>Готовимся к учебному году 2024/2025</h3>
+          <div class="blob"></div>
+        </div>
+        <div class="sec-title"><h2>Новинки</h2><a onclick="toast('Все новинки')">Все</a></div>
+        <div class="hstrip"><img src="assets/img/novinki.jpg" alt="Новинки: Математика, Обществознание, Информатика" onclick="toast('Карточка товара')"></div>
+        <div style="height:20px"></div>
+      </div>
+
+      <nav class="tabbar">
+        <div class="tab active"><svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Главная</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5 20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Поиск</div>
+        <div class="tab center" onclick="enterSmotrelka()"><div class="cbtn"><svg viewBox="0 0 24 24" fill="none"><path d="M9 7.5v9l7-4.5-7-4.5Z" fill="#fff"/></svg></div>Смотрелка</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 1-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Моя полка</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3.8" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Профиль</div>
+      </nav>
+    </section>
+
+    <!-- ============ MAIN Смотрелка ============ -->
+    <section class="page" id="screen-main">
+      <div class="statusbar" data-clock><span>9:41</span><div class="r">
+        <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+        <svg width="17" height="12" viewBox="0 0 17 12"><path d="M8.5 2.5c2.3 0 4.4.9 6 2.4l-1.4 1.4A6.6 6.6 0 0 0 8.5 5.5 6.6 6.6 0 0 0 3.9 6.3L2.5 4.9A9 9 0 0 1 8.5 2.5Z" fill="currentColor"/></svg>
+        <svg width="26" height="12" viewBox="0 0 26 12"><rect x="1" y="1" width="21" height="10" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/><rect x="3" y="3" width="16" height="6" rx="1.5" fill="currentColor"/><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+      </div></div>
+
+      <div class="page-scroll" id="main-scroll">
+        <div class="mhead">
+          <h1>Предмет и тема</h1>
+          <div class="actions">
+            <button class="icon-btn" onclick="openSearch()" aria-label="Поиск">
+              <svg width="20" height="20" viewBox="0 0 21 21"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 14l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <button class="icon-btn" onclick="toast('Раздел «Мои предметы» — скоро')" aria-label="Коллекция">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 7h16v13H4z" stroke="currentColor" stroke-width="1.8"/><path d="M9 7V4h6v3" stroke="currentColor" stroke-width="1.8"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="filters">
+          <div class="filter-row" onclick="openSheet('class')">
+            <div><div class="lbl">Класс</div><div class="val" id="f-class">1 класс</div></div>
+            <span class="chev"><svg width="10" height="16" viewBox="0 0 10 16"><path d="M2 2l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+          <div class="filter-row" onclick="openSheet('subject')">
+            <div><div class="lbl">Предмет</div><div class="val" id="f-subject">Математика</div></div>
+            <span class="chev"><svg width="10" height="16" viewBox="0 0 10 16"><path d="M2 2l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+
+        <div class="theme-list" id="theme-list"></div>
+        <div style="height:120px"></div>
+      </div>
+
+      <div class="floating"><button class="btn btn-primary" id="continue-btn" onclick="continueMain()"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M8 6v12l9-6-9-6Z" fill="#fff"/></svg><span id="continue-label">Смотреть все подряд</span></button></div>
+
+      <nav class="tabbar">
+        <div class="tab" onclick="go('screen-home')"><svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Главная</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5 20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Поиск</div>
+        <div class="tab center active"><div class="cbtn"><svg viewBox="0 0 24 24" fill="none"><path d="M9 7.5v9l7-4.5-7-4.5Z" fill="#fff"/></svg></div>Смотрелка</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 1-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Моя полка</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3.8" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Профиль</div>
+      </nav>
+    </section>
+
+    <!-- ============ THEME ============ -->
+    <section class="page" id="screen-theme">
+      <div class="statusbar" data-clock><span>9:41</span><div class="r">
+        <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+        <svg width="26" height="12" viewBox="0 0 26 12"><rect x="1" y="1" width="21" height="10" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/><rect x="3" y="3" width="16" height="6" rx="1.5" fill="currentColor"/><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+      </div></div>
+
+      <div class="subhead">
+        <button class="back" onclick="go('screen-main')"><svg width="11" height="18" viewBox="0 0 11 18"><path d="M9 2 2 9l7 7" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <span class="t">Математика, 1 класс</span>
+      </div>
+
+      <div class="page-scroll">
+        <div class="theme-hero">
+          <h1>На сколько больше?<br>На сколько меньше?</h1>
+          <div class="meta">5 уроков · ~15 минут</div>
+          <div class="prog"><div class="bar"><span id="theme-bar"></span></div><div class="pct" id="theme-pct">0%</div></div>
+        </div>
+        <div class="lessons" id="lessons"></div>
+        <div style="height:120px"></div>
+      </div>
+
+      <div class="floating"><button class="btn btn-primary" id="theme-continue" onclick="continueTheme()"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M8 6v12l9-6-9-6Z" fill="#fff"/></svg><span>Продолжить</span></button></div>
+
+      <nav class="tabbar">
+        <div class="tab" onclick="go('screen-home')"><svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Главная</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5 20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Поиск</div>
+        <div class="tab center active" onclick="go('screen-main')"><div class="cbtn"><svg viewBox="0 0 24 24" fill="none"><path d="M9 7.5v9l7-4.5-7-4.5Z" fill="#fff"/></svg></div>Смотрелка</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 1-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Моя полка</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3.8" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Профиль</div>
+      </nav>
+    </section>
+
+    <!-- ============ VIDEO ============ -->
+    <section class="page" id="screen-video">
+      <div class="videoWrap" id="videoWrap">
+        <img class="vblur" id="vblur" alt="">
+        <video id="player" playsinline muted preload="auto"></video>
+      </div>
+      <div class="statusbar light" data-clock><span>9:41</span><div class="r">
+        <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+        <svg width="26" height="12" viewBox="0 0 26 12"><rect x="1" y="1" width="21" height="10" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/><rect x="3" y="3" width="16" height="6" rx="1.5" fill="currentColor"/><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+      </div></div>
+
+      <div class="vtop"><button class="back" onclick="exitVideo()"><svg width="11" height="18" viewBox="0 0 11 18"><path d="M9 2 2 9l7 7" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <div class="vtopright"><button class="back" id="muteBtn" onclick="toggleMute()"></button></div>
+      <div class="sound-hint" id="sound-hint" onclick="unmuteVideo()">🔇 Нажмите для звука</div>
+      <div class="vplay" id="vplay" onclick="toggleVideoTap()"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 6v12l9-6-9-6Z" fill="#fff"/></svg></div>
+
+      <div class="vactions">
+        <div class="vact" id="vlike" onclick="toggleReact('like')"><div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M7 10v10H4V10h3Zm3 0 3.5-7c1.3 0 2.3 1.2 2 2.5L18 9h3.5c1 0 1.7 1 1.4 2l-1.7 7c-.2.9-1 1.5-1.9 1.5H10V10Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div><span>Нравится</span></div>
+        <div class="vact dis" id="vdislike" onclick="toggleReact('dislike')"><div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M17 14V4h3v10h-3Zm-3 0-3.5 7c-1.3 0-2.3-1.2-2-2.5L6 15H2.5c-1 0-1.7-1-1.4-2l1.7-7C3 5.1 3.8 4.5 4.7 4.5H14V14Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div><span>Не нравится</span></div>
+        <div class="vact" onclick="toast('Открывается меню «Поделиться»')"><div class="ic"><svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="18" cy="5" r="2.6" stroke="currentColor" stroke-width="1.7"/><circle cx="6" cy="12" r="2.6" stroke="currentColor" stroke-width="1.7"/><circle cx="18" cy="19" r="2.6" stroke="currentColor" stroke-width="1.7"/><path d="m8.3 10.7 7.4-4.4M8.3 13.3l7.4 4.4" stroke="currentColor" stroke-width="1.7"/></svg></div><span>Поделиться</span></div>
+        <div class="vact" onclick="openReport()"><div class="ic"><svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M12 8v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16.5" r="1.1" fill="currentColor"/><path d="M12 3 2 20h20L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div><span>Проблема</span></div>
+      </div>
+
+      <div class="video-tap" id="video-tap" onclick="playVideo(event)">
+        <div class="pcirc"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 6v12l9-6-9-6Z" fill="currentColor"/></svg></div>
+        <div class="lbl">Нажмите, чтобы включить</div>
+      </div>
+
+      <div class="swipe-hint" id="swipe-hint" onclick="goGame()">
+        <div class="hand">☝️</div>
+        <div class="txt">Смахни вверх<br>для продолжения</div>
+      </div>
+
+      <div class="vtitle" id="vtitle">Урок 1. На сколько больше?</div>
+      <div class="vbar"><span id="vbar"></span></div>
+
+      <nav class="tabbar" style="opacity:.97">
+        <div class="tab" onclick="exitVideo();go('screen-home')"><svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Главная</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5 20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Поиск</div>
+        <div class="tab center active"><div class="cbtn"><svg viewBox="0 0 24 24" fill="none"><path d="M9 7.5v9l7-4.5-7-4.5Z" fill="#fff"/></svg></div>Смотрелка</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 1-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Моя полка</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3.8" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Профиль</div>
+      </nav>
+    </section>
+
+    <!-- ============ GAME ============ -->
+    <section class="page" id="screen-game">
+      <div class="gamebg"></div>
+      <div class="statusbar light" data-clock><span>9:41</span><div class="r">
+        <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+        <svg width="26" height="12" viewBox="0 0 26 12"><rect x="1" y="1" width="21" height="10" rx="3" fill="none" stroke="#fff" stroke-opacity=".5"/><rect x="3" y="3" width="16" height="6" rx="1.5" fill="#fff"/></svg>
+      </div></div>
+
+      <div class="gtop">
+        <button class="back" onclick="exitGame()"><svg width="11" height="18" viewBox="0 0 11 18"><path d="M9 2 2 9l7 7" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="gprog"><div class="n" id="g-n">1 из 3</div><div class="seg" id="g-seg"></div></div>
+      </div>
+
+      <div class="garea" id="garea"></div>
+
+      <div class="countdown" id="countdown"><div class="m" id="cd-m"></div><div class="c" id="cd-c">3</div><div class="cap">Начинаем!</div></div>
+    </section>
+
+    <!-- ============ CHARACTER SELECT (technical) ============ -->
+    <section class="page" id="screen-charselect">
+      <div class="cs-bg"></div>
+      <div class="statusbar light" data-clock><span>9:41</span><div class="r">
+        <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/><rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+        <svg width="26" height="12" viewBox="0 0 26 12"><rect x="1" y="1" width="21" height="10" rx="3" fill="none" stroke="#fff" stroke-opacity=".5"/><rect x="3" y="3" width="16" height="6" rx="1.5" fill="#fff"/></svg>
+      </div></div>
+      <div class="cs-wrap">
+        <div class="cs-mascot" id="cs-mascot"></div>
+        <h1 class="cs-title">Кто проведёт урок?</h1>
+        <p class="cs-sub">Выбери персонажа — он будет вести ролики в «Смотрелке»</p>
+        <div class="cs-grid" id="cs-grid"></div>
+        <div class="cs-note">Технический экран · прямая ссылка на персонажа:<br><b id="cs-link">/kira</b></div>
+      </div>
+    </section>
+
+    <!-- overlays -->
+    <div class="scrim" id="scrim"><div class="sheet" id="sheet-body"></div></div>
+    <div class="scrim center" id="modal"><div id="modal-body"></div></div>
+    <div class="toast" id="toast"></div>
+
+    <!-- search overlay -->
+    <section class="page" id="screen-search" style="background:#fff">
+      <div class="searchbar">
+        <svg width="20" height="20" viewBox="0 0 21 21" style="color:#9E99AC"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 14l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="search-input" placeholder="Поиск темы" oninput="runSearch(this.value)" autocomplete="off">
+        <span class="cancel" onclick="closeSearch()">Отмена</span>
+      </div>
+      <div class="page-scroll"><div class="theme-list" id="search-results"></div></div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+/* ============ MASCOT ============ */
+function mascot(mood){
+  mood=mood||'happy';
+  var mouth = mood==='happy' ? '<path d="M40 66c4 6 16 6 20 0" stroke="#3A2A6B" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
+    : mood==='think' ? '<path d="M42 68c3-3 11-3 15 0" stroke="#3A2A6B" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
+    : mood==='sad' ? '<path d="M40 70c4-6 16-6 20 0" stroke="#3A2A6B" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
+    : '<path d="M42 67h16" stroke="#3A2A6B" stroke-width="3.4" fill="none" stroke-linecap="round"/>';
+  var eyes = mood==='happy'
+    ? '<path d="M33 50c1.5-3 6-3 7.5 0" stroke="#3A2A6B" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M59 50c1.5-3 6-3 7.5 0" stroke="#3A2A6B" stroke-width="4" fill="none" stroke-linecap="round"/>'
+    : '<ellipse cx="37" cy="51" rx="4.2" ry="5" fill="#3A2A6B"/><ellipse cx="63" cy="51" rx="4.2" ry="5" fill="#3A2A6B"/><circle cx="38.5" cy="49" r="1.4" fill="#fff"/><circle cx="64.5" cy="49" r="1.4" fill="#fff"/>';
+  return '<svg viewBox="0 0 100 110" width="100%" height="100%">'
+    +'<defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A98BFF"/><stop offset="1" stop-color="#7C4FE0"/></linearGradient></defs>'
+    +'<path d="M50 6C64 26 86 42 86 66c0 20-16 34-36 34S14 86 14 66C14 42 36 26 50 6Z" fill="url(#mg)"/>'
+    +'<path d="M50 20c9 14 24 25 24 42 0 6-2 11-6 15-3-30-15-40-22-53-1 2 3-3 4-4Z" fill="#fff" opacity=".12"/>'
+    +'<ellipse cx="31" cy="61" rx="6" ry="4" fill="#FF9AC4" opacity=".55"/><ellipse cx="69" cy="61" rx="6" ry="4" fill="#FF9AC4" opacity=".55"/>'
+    +eyes+mouth
+    +'<path d="M20 30l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5Z" fill="#fff" opacity=".9"/>'
+    +'<path d="M82 22l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5 1.5-4Z" fill="#fff" opacity=".8"/>'
+    +'</svg>';
+}
+
+/* ============ DATA ============ */
+const IMG='assets/img/', VID='assets/videos/';
+
+/* ============ CHARACTERS ============ */
+// Когда придут ролики по персонажам — положить их в assets/videos/<slug>/lessonN.mp4
+// и переключить PER_CHAR_VIDEOS в true.
+const PER_CHAR_VIDEOS=true;
+const CHARACTERS=[
+  {slug:'kira',   name:'Кира',  tag:'Главная по идеям',       g:['#FF8FB1','#A06BF0']},
+  {slug:'temka1', name:'Тим',   tag:'Старший брат Тёмки',     g:['#FFB347','#FF7A3D']},
+  {slug:'temka2', name:'Тёмка', tag:'Мастер приключений',     mascot:true, g:['#FF9A3D','#F06B3D']},
+  {slug:'maks',   name:'Макс',  tag:'Энергичный блогер',      g:['#5AC8FA','#4A6BF0']},
+];
+const CHAR_BY_SLUG=Object.fromEntries(CHARACTERS.map(c=>[c.slug,c]));
+let currentCharSlug='kira';
+function currentChar(){ return CHAR_BY_SLUG[currentCharSlug]||CHARACTERS[0]; }
+function videoFor(n){ return PER_CHAR_VIDEOS ? VID+currentCharSlug+'/lesson'+n+'.mp4' : VID+'lesson'+n+'.mp4'; }
+function posterFor(slug,n){ return IMG+'poster/'+slug+'-'+n+'.jpg'; }
+
+const THEME = {
+  title:'На сколько больше? На сколько меньше?',
+  lessons:[
+    {n:1,title:'На сколько больше?',video:VID+'lesson1.mp4',sub:'Считаем, на сколько одних предметов больше',
+     mech:{type:'quiz',questions:[
+       {img:IMG+'image1.png',q:'На сколько кошек больше, чем мышек?',options:['На 1 больше','На 2 больше','На 3 больше','Поровну'],correct:1},
+       {q:'Что означает вопрос «на сколько больше?»',options:['Сколько предметов всего','Сколько лишних предметов в большей группе','Сколько предметов убрать','Сколько предметов в меньшей группе'],correct:1},
+       {img:IMG+'image2.png',q:'На сколько яблок больше, чем груш?',options:['На 2 больше','На 4 больше','На 6 больше','Поровну'],correct:0},
+     ]}},
+    {n:2,title:'На сколько меньше?',video:VID+'lesson2.mp4',sub:'Ищем, сколько предметов не хватает',
+     mech:{type:'match',prompt:'Соедини вопрос с правильным объяснением',pairs:[
+       {left:'Что значит «на сколько больше?»',right:'Сколько лишних предметов в большей группе'},
+       {left:'Что значит «на сколько меньше?»',right:'Сколько предметов не хватает меньшей группе'},
+       {left:'Как узнать, на сколько больше?',right:'Соединить предметы в пары и найти лишние'},
+     ]}},
+    {n:3,title:'Условные обозначения',video:VID+'lesson3.mp4',sub:'Заменяем предметы простыми значками',
+     mech:{type:'quiz',questions:[
+       {q:'Зачем нужны условные обозначения?',options:['Чтобы сделать рисунок сложнее','Чтобы заменить предметы простыми значками','Чтобы не считать предметы','Чтобы убрать все предметы'],correct:1},
+       {img:IMG+'image3.png',q:'Что рисовать в таблице вместо каждой кошки?',imgOptions:[IMG+'image4.png',IMG+'image5.png',IMG+'image6.png',IMG+'image7.png'],correct:2},
+       {img:IMG+'image8.png',q:'Мышку обозначаем треугольником. Сколько треугольников нужно нарисовать?',options:['2','4','3','5'],correct:2,hint:'Сколько мышек, столько и треугольников.'},
+     ]}},
+    {n:4,title:'Как заполнить таблицу по рисунку',video:VID+'lesson4.mp4',sub:'Переносим предметы в значки таблицы',
+     mech:{type:'match',prompt:'Соедини текст с нужным значком',legend:IMG+'image9.png',pairs:[
+       {left:'2 мышки',right:IMG+'image10.png',img:true},
+       {left:'2 кошки',right:IMG+'image11.png',img:true},
+       {left:'3 кошки',right:IMG+'image12.png',img:true},
+     ]}},
+    {n:5,title:'Как сравнить значки в таблице',video:VID+'lesson5.mp4',sub:'Сравниваем группы значков в таблице',
+     mech:{type:'quiz',questions:[
+       {img:IMG+'image13.png',q:'Кого больше?',options:['Мышек','Кошек','Поровну','Нельзя узнать'],correct:1},
+       {img:IMG+'image14.png',q:'На сколько кошек больше?',options:['На 1 больше','На 2 больше','На 4 больше','На 5 больше'],correct:0},
+       {img:IMG+'image14.png',q:'На сколько мышек меньше?',options:['На 5 меньше','На 4 меньше','На 1 меньше','Мышек больше'],correct:2},
+     ]}},
+  ]
+};
+// extra decorative themes for realism
+const DUMMY=[
+  {title:'Подготовка к изучению чисел',sub:'6 уроков · ~18 минут'},
+  {title:'Числа от 1 до 10. Нумерация',sub:'8 уроков · ~24 минуты'},
+  {title:'Числа от 1 до 10. Сложение и вычитание',sub:'7 уроков · ~21 минута'},
+  {title:'Сравнение предметов и групп',sub:'5 уроков · ~15 минут'},
+];
+
+/* ============ STATE ============ */
+let state = { done:[false,false,false,false,false], filterClass:'1 класс', filterSubject:'Математика', curLesson:0, sheet:null, sheetPick:null };
+function doneCount(){return state.done.filter(Boolean).length}
+function firstUndone(){for(let i=0;i<5;i++)if(!state.done[i])return i;return -1}
+function hasContent(){return state.filterClass==='1 класс' && state.filterSubject==='Математика'}
+
+/* ============ NAV ============ */
+const clockEls=[];
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
+  // stop video if leaving
+  const pl=document.getElementById('player');
+  if(id!=='screen-video'){ try{pl.pause();}catch(e){} pl.onended=null; clearInterval(videoTimers.bar); clearTimeout(videoTimers.hint);}
+}
+function enterSmotrelka(){ renderMain(); go('screen-main'); }
+
+/* ============ MAIN ============ */
+function renderMain(){
+  // continue button label
+  const cb=document.getElementById('continue-label');
+  const anyStarted=doneCount()>0;
+  document.getElementById('continue-btn').style.display = (hasContent()&&firstUndone()>=0)?'flex':'none';
+  cb.textContent = anyStarted?'Продолжить':'Смотреть все подряд';
+  const list=document.getElementById('theme-list');
+  if(!hasContent()){
+    list.innerHTML='<div class="empty"><div class="em">🔍</div><h3>Темы скоро появятся</h3><p>Для «'+state.filterSubject+', '+state.filterClass+'» контент ещё готовится. Выберите «Математика, 1 класс».</p></div>';
+    return;
+  }
+  list.innerHTML = themeCard(THEME.title,'5 уроков · ~15 минут',progressPct(),statusOf()) + DUMMY.map(d=>themeCard(d.title,d.sub,0,'new',true)).join('');
+  // bind first card
+  list.firstElementChild.onclick=openTheme;
+  [...list.children].slice(1).forEach(c=>c.onclick=()=>toast('Демо-тема доступна: «На сколько больше?»'));
+}
+function progressPct(){return Math.round(doneCount()/5*100)}
+function statusOf(){const p=progressPct();return p===0?'new':p===100?'done':'started'}
+function themeCard(title,sub,pct,status,dummy){
+  const icClass = status==='done'?'done':status==='started'?'started':'';
+  const star = status==='done'
+    ? '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 5 12l1.4-1.4L9 13.4 17.6 5 19 6.4 9 16.2Z"/></svg>'
+    : '<svg width="26" height="26" viewBox="0 0 24 24" fill="'+(status==='started'?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.7"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.1l1-5.8-4.3-4.1 5.9-.9L12 3Z" stroke-linejoin="round"/></svg>';
+  return '<div class="theme-card">'
+    +'<div class="theme-ic '+icClass+'">'+star+'</div>'
+    +'<div class="theme-main"><h3>'+title+'</h3><div class="sub">'+sub+'</div>'
+    +(dummy?'':'<div class="prog"><div class="bar"><span style="width:'+pct+'%"></span></div><div class="pct">'+pct+'%</div></div>')+'</div>'
+    +'<span class="go"><svg width="9" height="15" viewBox="0 0 10 16"><path d="M2 2l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
+    +'</div>';
+}
+function continueMain(){ openTheme(); setTimeout(()=>{const i=firstUndone(); startLesson(i<0?0:i);},80); }
+
+/* ============ SHEETS (filters) ============ */
+const CLASSES=['1 класс','2 класс','3 класс','4 класс'];
+const SUBJECTS=['Математика','Русский язык','Окружающий мир','Литературное чтение'];
+function openSheet(kind){
+  state.sheet=kind;
+  const opts = kind==='class'?CLASSES:SUBJECTS;
+  const cur = kind==='class'?state.filterClass:state.filterSubject;
+  state.sheetPick=cur;
+  const body=document.getElementById('sheet-body');
+  body.className='sheet';
+  body.innerHTML='<div class="grip"></div><h2>'+(kind==='class'?'Класс':'Предмет')+'</h2>'
+    +'<div id="opts">'+opts.map(o=>'<div class="opt'+(o===cur?' sel':'')+'" data-v="'+o+'"><span>'+o+'</span><span class="radio"></span></div>').join('')+'</div>'
+    +'<button class="btn btn-primary" onclick="applySheet()">Выбрать</button>';
+  body.querySelectorAll('.opt').forEach(el=>el.onclick=()=>{
+    body.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
+    el.classList.add('sel'); state.sheetPick=el.dataset.v;
+  });
+  document.getElementById('scrim').classList.add('show');
+}
+function applySheet(){
+  if(state.sheet==='class'){state.filterClass=state.sheetPick;document.getElementById('f-class').textContent=state.sheetPick;}
+  else{state.filterSubject=state.sheetPick;document.getElementById('f-subject').textContent=state.sheetPick;}
+  closeScrim(); renderMain();
+}
+function closeScrim(){document.getElementById('scrim').classList.remove('show');}
+document.getElementById('scrim').addEventListener('click',e=>{if(e.target.id==='scrim')closeScrim();});
+
+/* ============ THEME ============ */
+function openTheme(){ renderTheme(); go('screen-theme'); }
+function renderTheme(){
+  document.getElementById('theme-bar').style.width=progressPct()+'%';
+  document.getElementById('theme-pct').textContent=progressPct()+'%';
+  const el=document.getElementById('lessons');
+  el.innerHTML=THEME.lessons.map((l,i)=>{
+    const done=state.done[i];
+    return '<div class="lesson'+(done?' done':'')+'" onclick="startLesson('+i+')">'
+      +'<div class="lvid"><span class="num">'+l.n+'</span>'
+        +'<img src="'+posterFor(currentCharSlug,l.n)+'" alt="" loading="lazy">'
+        +'<div class="play"><svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="rgba(0,0,0,.35)"/><path d="M10 8.5v7l5.5-3.5L10 8.5Z" fill="#fff"/></svg></div>'
+        +'<div class="lok"><svg width="30" height="30" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#2E9E52"/><path d="M7 12.5 10.5 16 17 8.5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'
+      +'</div>'
+      +'<div class="lesson-main"><div class="k">Урок '+l.n+'</div><h3>'+l.title+'</h3>'
+        +'<div class="st">'+(done?'<svg width="13" height="13" viewBox="0 0 24 24" fill="#2E9E52"><path d="M9 16.2 5 12l1.4-1.4L9 13.4 17.6 5 19 6.4 9 16.2Z"/></svg> Пройдено':mechLabel(l.mech.type)+' · '+mechCount(l.mech))+'</div></div>'
+      +'<span class="go"><svg width="9" height="15" viewBox="0 0 10 16"><path d="M2 2l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
+      +'</div>';
+  }).join('');
+  // continue btn: show first undone
+  const tc=document.getElementById('theme-continue');
+  tc.style.display = firstUndone()>=0 ? 'flex':'none';
+}
+function mechLabel(t){return t==='quiz'?'Квиз':'Соедини пары';}
+function mechCount(m){return m.type==='quiz'?m.questions.length+' вопроса':m.pairs.length+' пары';}
+function continueTheme(){const i=firstUndone();startLesson(i<0?0:i);}
+
+/* ============ VIDEO ============ */
+let videoTimers={bar:null,hint:null};
+let soundOn=false;
+function spkIcon(on){ return on
+  ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><path d="M16 8.6a4 4 0 0 1 0 6.8M18.6 6a7.5 7.5 0 0 1 0 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+  : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><path d="m16.5 9.5 5 5m0-5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'; }
+function updateMuteIcon(){ document.getElementById('muteBtn').innerHTML=spkIcon(soundOn); }
+function toggleMute(){ soundOn=!soundOn; document.getElementById('player').muted=!soundOn; updateMuteIcon(); document.getElementById('sound-hint').classList.remove('show'); }
+function unmuteVideo(){ if(!soundOn){ soundOn=true; document.getElementById('player').muted=false; updateMuteIcon(); document.getElementById('sound-hint').classList.remove('show'); } }
+function toggleVideoTap(){
+  const scr=document.getElementById('screen-video'), pl=document.getElementById('player');
+  if(document.getElementById('video-tap').classList.contains('show')) return; // autoplay-blocked overlay handles its own tap
+  if(scr.classList.contains('showctl')){ scr.classList.remove('showctl'); pl.play().catch(()=>{}); }
+  else { scr.classList.add('showctl'); pl.pause(); document.getElementById('sound-hint').classList.remove('show'); }
+}
+
+function startLesson(i){
+  state.curLesson=i;
+  const l=THEME.lessons[i];
+  const pl=document.getElementById('player');
+  pl.src=videoFor(l.n); pl.currentTime=0; pl.muted=!soundOn;
+  document.getElementById('vblur').src=posterFor(currentCharSlug,l.n);
+  document.getElementById('vtitle').textContent='Урок '+l.n+'. '+l.title;
+  document.getElementById('vbar').style.width='0%';
+  document.getElementById('swipe-hint').classList.remove('show');
+  document.getElementById('video-tap').classList.remove('show');
+  document.getElementById('screen-video').classList.remove('showctl');
+  document.getElementById('vlike').classList.remove('on');
+  document.getElementById('vdislike').classList.remove('on');
+  updateMuteIcon();
+  // show swipe hint after the first full playthrough, then keep looping
+  pl.onended=()=>{ document.getElementById('swipe-hint').classList.add('show'); pl.currentTime=0; pl.play().catch(()=>{}); };
+  go('screen-video');
+  clearInterval(videoTimers.bar);
+  videoTimers.bar=setInterval(()=>{
+    if(pl.duration) document.getElementById('vbar').style.width=(pl.currentTime/pl.duration*100)+'%';
+  },200);
+  tryPlayVideo();
+}
+function tryPlayVideo(){
+  const pl=document.getElementById('player');
+  const tap=document.getElementById('video-tap');
+  const p=pl.play();
+  if(p&&p.then){ p.then(()=>{ tap.classList.remove('show'); if(!soundOn) showSoundHint(); }).catch(()=>{ tap.classList.add('show'); }); }
+}
+function showSoundHint(){ const h=document.getElementById('sound-hint'); h.classList.add('show'); clearTimeout(videoTimers.hint); videoTimers.hint=setTimeout(()=>h.classList.remove('show'),4500); }
+function playVideo(e){ if(e)e.stopPropagation(); const pl=document.getElementById('player'); document.getElementById('video-tap').classList.remove('show'); soundOn=true; pl.muted=false; updateMuteIcon(); pl.play().catch(()=>{ pl.muted=true; soundOn=false; updateMuteIcon(); pl.play().catch(()=>{}); }); }
+function exitVideo(){ go('screen-theme'); renderTheme(); }
+function toggleReact(k){
+  const el=document.getElementById(k==='like'?'vlike':'vdislike');
+  el.classList.toggle('on');
+}
+// swipe up detection on video
+(function(){
+  const wrap=document.getElementById('videoWrap');
+  let y0=null;
+  wrap.addEventListener('touchstart',e=>{y0=e.touches[0].clientY;},{passive:true});
+  wrap.addEventListener('touchend',e=>{ if(y0!==null){const dy=y0-e.changedTouches[0].clientY; if(dy>60)goGame(); else if(Math.abs(dy)<10)toggleVideoTap(); y0=null;}});
+  // mouse drag for desktop
+  let my=null;
+  wrap.addEventListener('mousedown',e=>{my=e.clientY;});
+  wrap.addEventListener('mouseup',e=>{ if(my!==null){const dy=my-e.clientY; if(dy>60)goGame(); else if(Math.abs(dy)<10)toggleVideoTap(); my=null;}});
+  // wheel up
+  document.getElementById('screen-video').addEventListener('wheel',e=>{ if(e.deltaY<-30 && document.getElementById('screen-video').classList.contains('active'))goGame(); },{passive:true});
+})();
+
+/* ============ REPORT form ============ */
+function openReport(){
+  const b=document.getElementById('sheet-body');
+  b.className='sheet report';
+  b.innerHTML='<div class="grip"></div><h2>Сообщите о проблеме</h2>'
+    +'<textarea id="rep" maxlength="1000" placeholder="Опишите, что не так с этим роликом…" oninput="document.getElementById(\'rc\').textContent=this.value.length+\'/1000\'"></textarea>'
+    +'<div class="counter" id="rc">0/1000</div>'
+    +'<button class="btn btn-primary" onclick="closeScrim();toast(\'Спасибо! Обращение отправлено\')">Отправить</button>';
+  document.getElementById('scrim').classList.add('show');
+}
+
+/* ============ GAME ============ */
+let game=null;
+function goGame(){
+  document.getElementById('swipe-hint').classList.remove('show');
+  const pl=document.getElementById('player'); try{pl.pause();}catch(e){}
+  clearInterval(videoTimers.bar); clearTimeout(videoTimers.hint);
+  const l=THEME.lessons[state.curLesson];
+  game={mech:l.mech, step:0, total: l.mech.type==='quiz'?l.mech.questions.length:l.mech.pairs.length, matched:0, sel:null};
+  go('screen-game');
+  // countdown intro
+  const cd=document.getElementById('countdown');
+  document.getElementById('cd-m').innerHTML=mascot('happy');
+  cd.classList.add('show');
+  let n=3; document.getElementById('cd-c').textContent=n;
+  const iv=setInterval(()=>{
+    n--;
+    if(n<=0){clearInterval(iv);cd.classList.remove('show');renderGame();}
+    else{const c=document.getElementById('cd-c');c.textContent=n;c.style.animation='none';c.offsetHeight;c.style.animation='pop .5s ease';}
+  },700);
+}
+function updateProg(){
+  document.getElementById('g-n').textContent=(Math.min(game.step+1,game.total))+' из '+game.total;
+  const seg=document.getElementById('g-seg');
+  seg.innerHTML=Array.from({length:game.total},(_,i)=>'<i class="'+(i<game.step?'on':'')+'"></i>').join('');
+}
+function renderGame(){
+  updateProg();
+  if(game.mech.type==='quiz') renderQuiz();
+  else renderMatch();
+}
+function renderQuiz(){
+  const q=game.mech.questions[game.step];
+  const area=document.getElementById('garea');
+  let html='<div class="qbubble"><div class="m">'+mascot('happy')+'</div><div class="qt">'+q.q+'</div></div>';
+  html+='<div class="qmid">';
+  if(q.img) html+='<div class="qimg"><img src="'+q.img+'"></div>';
+  if(q.imgOptions){
+    html+='<div class="answers">'+q.imgOptions.map((src,i)=>'<button class="ans img-ans" data-i="'+i+'" onclick="answer('+i+')"><img src="'+src+'"></button>').join('')+'</div>';
+  }else{
+    html+='<div class="answers">'+q.options.map((o,i)=>'<button class="ans" data-i="'+i+'" onclick="answer('+i+')">'+o+'</button>').join('')+'</div>';
+  }
+  html+='<div class="qhint" id="qhint"></div>';
+  html+='</div>';
+  html+='<div class="gnext" id="gnext"><button class="btn btn-primary" onclick="nextStep()">Далее</button></div>';
+  area.innerHTML=html;
+  area.scrollTop=0;
+}
+function answer(i){
+  const q=game.mech.questions[game.step];
+  const btns=document.querySelectorAll('#garea .ans');
+  btns.forEach(b=>b.setAttribute('disabled','1'));
+  if(i===q.correct){
+    btns[i].classList.add('correct','pop');
+    btns.forEach((b,idx)=>{ if(idx!==i) b.classList.add('dim'); });
+    celebrateCorrect(btns[i]);
+    if(q.hint){const h=document.getElementById('qhint');h.textContent='💡 '+q.hint;h.classList.add('show');}
+    document.getElementById('gnext').classList.add('show');
+  } else {
+    // не подсвечиваем правильный — чтобы не подсматривать ответ
+    btns.forEach((b,idx)=>{ if(idx===i)b.classList.add('wrong','shake'); else b.classList.add('dim'); });
+    setTimeout(showWrong,650);
+  }
+}
+function celebrateCorrect(btn){
+  const m=document.querySelector('#garea .qbubble .m');
+  if(m){ m.style.animation='none'; m.offsetHeight; m.style.animation='bounceM .6s ease'; }
+  const badge=document.createElement('div'); badge.className='ok-badge'; badge.textContent='✓'; btn.appendChild(badge);
+  const r=btn.getBoundingClientRect(); burst(r.left+r.width/2, r.top+r.height/2);
+}
+function burst(x,y){
+  const host=document.getElementById('screen-game'); const hr=host.getBoundingClientRect();
+  const cols=['#FFC53D','#39C376','#7B61FF','#FF6FA5','#5AC8FA','#FF8A3D'];
+  for(let k=0;k<20;k++){
+    const p=document.createElement('i'); p.className='particle';
+    const ang=(Math.PI*2*k/20)+Math.random()*0.4, dist=55+Math.random()*95;
+    p.style.left=(x-hr.left)+'px'; p.style.top=(y-hr.top)+'px'; p.style.background=cols[k%cols.length];
+    p.style.setProperty('--dx',(Math.cos(ang)*dist).toFixed(0)+'px');
+    p.style.setProperty('--dy',(Math.sin(ang)*dist).toFixed(0)+'px');
+    if(k%3===0){p.style.width='11px';p.style.height='11px';p.style.borderRadius='2px';}
+    host.appendChild(p); setTimeout(()=>p.remove(),900);
+  }
+}
+function showWrong(){
+  const m=document.getElementById('modal'), b=document.getElementById('modal-body');
+  b.innerHTML='<div class="result sad"><div class="m">'+mascot('sad')+'</div>'
+    +'<h2>Ой, не то…</h2><p>Ничего страшного! Давай вместе ещё раз посмотрим ролик — и всё получится.</p>'
+    +'<div class="btns"><button class="btn btn-primary" onclick="retryLesson()">Посмотреть ролик</button>'
+    +'<button class="btn btn-ghost" onclick="closeModal();exitGame()">Выйти к теме</button></div></div>';
+  m.classList.add('show');
+}
+function retryLesson(){ closeModal(); startLesson(state.curLesson); }
+function nextStep(){
+  game.step++;
+  if(game.step>=game.total){ finishGame(); return; }
+  updateProg(); renderQuiz();
+}
+
+/* ---- match mechanic ---- */
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function renderMatch(){
+  const m=game.mech;
+  const area=document.getElementById('garea');
+  const lefts=m.pairs.map((p,i)=>({t:p.left,idx:i}));
+  const rights=shuffle(m.pairs.map((p,i)=>({t:p.right,idx:i,img:!!p.img})));
+  game.matched=0; game.sel=null;
+  let html='<div class="qbubble"><div class="m">'+mascot('happy')+'</div><div class="qt">'+m.prompt+'</div></div>';
+  html+='<div class="qmid">';
+  if(m.legend) html+='<div class="match-legend"><img src="'+m.legend+'"></div>';
+  html+='<div class="match-cols"><div class="mcol" id="mL">'
+    +lefts.map(l=>'<div class="mitem" data-side="L" data-idx="'+l.idx+'">'+l.t+'</div>').join('')
+    +'</div><div class="mcol" id="mR">'
+    +rights.map(r=>'<div class="mitem '+(r.img?'img':'')+'" data-side="R" data-idx="'+r.idx+'">'+(r.img?'<img src="'+r.t+'">':r.t)+'</div>').join('')
+    +'</div></div>';
+  html+='</div>';
+  area.innerHTML=html;
+  area.querySelectorAll('.mitem').forEach(el=>el.onclick=()=>pickMatch(el));
+  updateProg();
+  area.scrollTop=0;
+}
+function pickMatch(el){
+  if(el.classList.contains('matched'))return;
+  const side=el.dataset.side;
+  if(!game.sel){ game.sel=el; el.classList.add('sel'); return; }
+  if(game.sel===el){ el.classList.remove('sel'); game.sel=null; return; }
+  if(game.sel.dataset.side===side){ // switch selection within same column
+    game.sel.classList.remove('sel'); game.sel=el; el.classList.add('sel'); return;
+  }
+  // different columns -> check
+  const a=game.sel, b=el;
+  if(a.dataset.idx===b.dataset.idx){
+    a.classList.remove('sel'); a.classList.add('matched'); b.classList.add('matched');
+    game.sel=null; game.matched++; game.step=game.matched; updateProg();
+    if(game.matched>=game.mech.pairs.length){ setTimeout(finishGame,450); }
+  }else{
+    a.classList.add('flash'); b.classList.add('flash');
+    setTimeout(()=>{a.classList.remove('flash','sel');b.classList.remove('flash');},420);
+    game.sel=null;
+  }
+}
+
+/* ============ RESULTS ============ */
+function finishGame(){
+  state.done[state.curLesson]=true;
+  if(doneCount()>=5){ showFinal(); }
+  else { showInter(); }
+}
+function confetti(host,n){
+  n=n||40;
+  const c=document.createElement('div');c.className='confetti';
+  const cols=['#7B61FF','#FFC53D','#39C376','#FF6FA5','#5AC8FA','#FF8A3D'];
+  for(let i=0;i<n;i++){const s=document.createElement('i');s.style.left=Math.random()*100+'%';s.style.background=cols[i%cols.length];s.style.animationDuration=(1.8+Math.random()*1.8)+'s';s.style.animationDelay=(Math.random()*0.7)+'s';if(i%4===0)s.style.borderRadius='50%';c.appendChild(s);}
+  host.appendChild(c);
+}
+function showInter(){
+  const m=document.getElementById('modal'), b=document.getElementById('modal-body');
+  const next=THEME.lessons[state.curLesson+1];
+  b.innerHTML='<div class="result"><div class="m">'+mascot('happy')+'</div>'
+    +'<h2>Урок пройден!</h2><p>Отлично! Ты закрыл(а) «'+THEME.lessons[state.curLesson].title+'».</p>'
+    +'<div class="prog"><div class="bar" style="height:8px;border-radius:6px;background:#EDEBF2;overflow:hidden"><span style="display:block;height:100%;background:var(--grad);width:'+progressPct()+'%"></span></div></div>'
+    +'<p style="margin-top:8px;font-weight:700;color:var(--brand-ink)">'+doneCount()+' из 5 уроков темы</p>'
+    +'<div class="btns"><button class="btn btn-primary" onclick="closeModal();startLesson('+(state.curLesson+1)+')">Продолжить'+(next?' · Урок '+next.n:'')+'</button>'
+    +'<button class="btn btn-ghost" onclick="closeModal();go(\'screen-theme\');renderTheme()">Выйти</button></div></div>';
+  m.classList.add('show');
+  confetti(b.querySelector('.result'));
+}
+function showFinal(){
+  const m=document.getElementById('modal'), b=document.getElementById('modal-body');
+  b.innerHTML='<div class="result final"><div class="glow"></div><div class="m">'+mascot('happy')+'</div>'
+    +'<div class="stars"><svg class="star" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.1l1-5.8-4.3-4.1 5.9-.9L12 3Z"/></svg><svg class="star" width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.1l1-5.8-4.3-4.1 5.9-.9L12 3Z"/></svg><svg class="star" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.1l1-5.8-4.3-4.1 5.9-.9L12 3Z"/></svg></div>'
+    +'<h2>Тема пройдена! 🎉</h2><p>Все 5 уроков темы «На сколько больше? На сколько меньше?» завершены. Ты молодец!</p>'
+    +'<div class="btns"><button class="btn btn-primary" onclick="closeModal();enterSmotrelka()">На главную</button>'
+    +'<button class="btn btn-ghost" onclick="resetProgress();closeModal();openTheme()">Пройти тему заново</button></div></div>';
+  m.classList.add('show');
+  confetti(b.querySelector('.result'),80);
+}
+function closeModal(){document.getElementById('modal').classList.remove('show');document.getElementById('modal-body').innerHTML='';}
+function exitGame(){ go('screen-theme'); renderTheme(); }
+function resetProgress(){ state.done=[false,false,false,false,false]; }
+
+/* ============ SEARCH ============ */
+function openSearch(){ go('screen-search'); document.getElementById('search-input').value=''; runSearch(''); setTimeout(()=>document.getElementById('search-input').focus(),100); }
+function closeSearch(){ go('screen-main'); }
+function runSearch(q){
+  const res=document.getElementById('search-results');
+  const all=[{title:THEME.title,sub:'5 уроков · ~15 минут',real:true},...DUMMY];
+  const f=all.filter(t=>t.title.toLowerCase().includes(q.trim().toLowerCase()));
+  if(!f.length){res.innerHTML='<div class="empty"><div class="em">🔍</div><h3>Ничего не найдено</h3><p>Попробуйте изменить запрос</p></div>';return;}
+  res.innerHTML=f.map(t=>themeCard(t.title,t.sub,t.real?progressPct():0,t.real?statusOf():'new',!t.real)).join('');
+  [...res.children].forEach((c,i)=>{ c.onclick=()=> f[i].real?(closeSearch(),openTheme()):toast('Демо-тема: «На сколько больше?»'); });
+}
+
+/* ============ TOAST ============ */
+let toastT=null;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2000);}
+
+/* ============ CHARACTER SELECT ============ */
+function renderCharSelect(){
+  document.getElementById('cs-mascot').innerHTML=mascot('happy');
+  document.getElementById('cs-grid').innerHTML=CHARACTERS.map(c=>
+    '<div class="cs-card" onclick="selectCharacter(\''+c.slug+'\')">'
+    +'<div class="cs-av" style="background:linear-gradient(135deg,'+c.g[0]+','+c.g[1]+')"><img src="'+posterFor(c.slug,1)+'" alt="">'+(c.mascot?'<span class="cs-badge">маскот</span>':'')+'</div>'
+    +'<div class="cs-name">'+c.name+'</div><div class="cs-tag">'+c.tag+'</div></div>').join('');
+  const cl=document.getElementById('cs-link'); if(cl) cl.textContent='/'+currentCharSlug;
+}
+function updateCharAvatar(){ const c=currentChar(); const el=document.getElementById('charAvatar'); if(el){ el.style.background='linear-gradient(135deg,'+c.g[0]+','+c.g[1]+')'; el.innerHTML='<img src="'+posterFor(c.slug,1)+'" alt="">'; } }
+function openCharSelect(){ renderCharSelect(); go('screen-charselect'); }
+function selectCharacter(slug){
+  if(!CHAR_BY_SLUG[slug]) return;
+  currentCharSlug=slug;
+  try{ history.replaceState(null,'','/'+slug); }catch(e){}
+  updateCharAvatar(); renderMain(); go('screen-home');
+  toast('Персонаж: '+currentChar().name);
+}
+function parseCharFromURL(){
+  try{
+    const q=new URLSearchParams(location.search).get('c'); if(q&&CHAR_BY_SLUG[q])return q;
+    const h=location.hash.replace(/^#/,'').replace(/^c=/,''); if(h&&CHAR_BY_SLUG[h])return h;
+    const seg=decodeURIComponent((location.pathname.split('/').filter(Boolean).pop()||'').replace(/\.html?$/,'')); if(seg&&CHAR_BY_SLUG[seg])return seg;
+  }catch(e){}
+  return null;
+}
+function initApp(){
+  const slug=parseCharFromURL();
+  if(slug){ currentCharSlug=slug; updateCharAvatar(); renderMain(); go('screen-home'); }
+  else { updateCharAvatar(); renderCharSelect(); go('screen-charselect'); }
+}
+
+/* init */
+initApp();
+</script>
+</body>
+</html>
