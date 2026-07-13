@@ -10,7 +10,8 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.YC_S3_SECRET }}
   AWS_DEFAULT_REGION: ru-central1
   ENDPOINT: https://storage.yandexcloud.net
-  BUCKET: ${{ secrets.YC_BUCKET }}
+  # Имя бакета не секретное — задаём прямо здесь (убирает проблему с пустым секретом)
+  BUCKET: smotrelka
   # Yandex Object Storage не принимает новые CRC-чек-суммы AWS CLI v2.23+ — отключаем
   AWS_REQUEST_CHECKSUM_CALCULATION: WHEN_REQUIRED
   AWS_RESPONSE_CHECKSUM_VALIDATION: WHEN_REQUIRED

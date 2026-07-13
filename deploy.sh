@@ -4,7 +4,7 @@
 # Запуск:  YC_BUCKET=имя-бакета ./deploy.sh
 set -euo pipefail
 
-BUCKET="${YC_BUCKET:?Укажи имя бакета: YC_BUCKET=my-bucket ./deploy.sh}"
+BUCKET="${YC_BUCKET:-smotrelka}"
 EP="https://storage.yandexcloud.net"
 # Yandex Object Storage не принимает новые CRC-чек-суммы AWS CLI v2.23+ — отключаем
 export AWS_REQUEST_CHECKSUM_CALCULATION=WHEN_REQUIRED
