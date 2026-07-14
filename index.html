@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Смотрелка — прототип</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -228,7 +228,12 @@ h1,h2,h3,.head{font-family:'Nunito',sans-serif}
 .match-prompt{color:#fff;font-family:'Nunito';font-weight:800;font-size:15px;text-align:center;margin:4px 0 10px;opacity:.95}
 .match-legend{background:#fff;border-radius:16px;padding:8px;margin:0 auto 12px;max-width:230px;box-shadow:0 8px 20px rgba(40,20,90,.14)}
 .match-legend img{width:100%;border-radius:10px;display:block}
-.match-cols{display:flex;gap:12px;align-items:stretch}
+.match-cols{display:flex;gap:12px;align-items:stretch;position:relative}
+.match-links{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:4}
+.match-links .link-path{fill:none;stroke:var(--ok-ink);stroke-width:3.5;stroke-linecap:round;animation:linkdraw .45s ease forwards}
+.match-links .link-dot{fill:var(--ok-ink);animation:linkpop .3s ease .12s both}
+@keyframes linkdraw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+@keyframes linkpop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 .mcol{flex:1;display:flex;flex-direction:column;gap:12px}
 .mitem{background:#fff;border-radius:16px;min-height:78px;padding:10px 12px;font-family:'Nunito';font-weight:800;font-size:13.5px;color:var(--ink);display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.15;cursor:pointer;border:2.5px solid transparent;transition:.15s;box-shadow:0 5px 14px rgba(40,20,90,.12)}
 .mitem.img{padding:8px}
@@ -338,11 +343,15 @@ h1,h2,h3,.head{font-family:'Nunito',sans-serif}
 .char-chip video,.char-chip img{width:100%;height:100%;object-fit:cover;object-position:50% 8%;display:block}
 
 /* ===== адаптив: на телефоне — на весь экран, без рамки-мокапа ===== */
+/* На телефонах — полноэкранный адаптив без мокапа телефона (порог 480px) */
 @media (max-width:480px){
-  body{padding:0;background:#000;align-items:stretch}
-  .device{width:100vw;height:100vh;height:100dvh;max-width:none;border-radius:0;padding:0;box-shadow:none}
-  .screen{border-radius:0}
+  html,body{background:#000}
+  body{padding:0;background:#000;align-items:stretch;justify-content:stretch}
+  .device{width:100vw;height:100vh;height:100dvh;max-width:none;border-radius:0;padding:0;box-shadow:none;background:transparent}
+  .screen{border-radius:0;box-shadow:none}
   .notch,.statusbar{display:none}
+  /* нижняя навигация уходит под системный индикатор — добавляем safe-area */
+  .tabbar{height:auto;min-height:82px;padding-bottom:calc(env(safe-area-inset-bottom,0px))}
 }
 
 .hidden{display:none!important}
@@ -803,8 +812,15 @@ function showSoundHint(){ const h=document.getElementById('sound-hint'); h.class
 function playVideo(e){ if(e)e.stopPropagation(); const pl=document.getElementById('player'); document.getElementById('video-tap').classList.remove('show'); soundOn=true; pl.muted=false; updateMuteIcon(); pl.play().catch(()=>{ pl.muted=true; soundOn=false; updateMuteIcon(); pl.play().catch(()=>{}); }); }
 function exitVideo(){ go('screen-theme'); renderTheme(); }
 function toggleReact(k){
-  const el=document.getElementById(k==='like'?'vlike':'vdislike');
-  el.classList.toggle('on');
+  const like=document.getElementById('vlike');
+  const dislike=document.getElementById('vdislike');
+  const el=k==='like'?like:dislike;
+  const other=k==='like'?dislike:like;
+  const wasOn=el.classList.contains('on');
+  // одно отменяет другое: сначала гасим оба, затем включаем нажатое (если не было включено)
+  like.classList.remove('on');
+  dislike.classList.remove('on');
+  if(!wasOn) el.classList.add('on');
 }
 // swipe up detection on video
 (function(){
@@ -939,7 +955,7 @@ function renderMatch(){
   let html='<div class="qbubble"><div class="m">'+mascot('happy')+'</div><div class="qt">'+m.prompt+'</div></div>';
   html+='<div class="qmid">';
   if(m.legend) html+='<div class="match-legend"><img src="'+m.legend+'"></div>';
-  html+='<div class="match-cols"><div class="mcol" id="mL">'
+  html+='<div class="match-cols"><svg class="match-links" id="mSvg"></svg><div class="mcol" id="mL">'
     +lefts.map(l=>'<div class="mitem" data-side="L" data-idx="'+l.idx+'">'+l.t+'</div>').join('')
     +'</div><div class="mcol" id="mR">'
     +rights.map(r=>'<div class="mitem '+(r.img?'img':'')+'" data-side="R" data-idx="'+r.idx+'">'+(r.img?'<img src="'+r.t+'">':r.t)+'</div>').join('')
@@ -962,13 +978,41 @@ function pickMatch(el){
   const a=game.sel, b=el;
   if(a.dataset.idx===b.dataset.idx){
     a.classList.remove('sel'); a.classList.add('matched'); b.classList.add('matched');
+    drawLink(a,b);
     game.sel=null; game.matched++; game.step=game.matched; updateProg();
-    if(game.matched>=game.mech.pairs.length){ setTimeout(finishGame,450); }
+    if(game.matched>=game.mech.pairs.length){ setTimeout(finishGame,650); }
   }else{
     a.classList.add('flash'); b.classList.add('flash');
     setTimeout(()=>{a.classList.remove('flash','sel');b.classList.remove('flash');},420);
     game.sel=null;
   }
+}
+// рисуем линию-соединитель между сматченной парой
+function drawLink(a,b){
+  const svg=document.getElementById('mSvg'); if(!svg)return;
+  const box=svg.getBoundingClientRect();
+  // левый — тот, что визуально левее
+  const L=a.getBoundingClientRect().left<b.getBoundingClientRect().left?a:b;
+  const R=L===a?b:a;
+  const rl=L.getBoundingClientRect(), rr=R.getBoundingClientRect();
+  const x1=rl.right-box.left, y1=rl.top+rl.height/2-box.top;
+  const x2=rr.left -box.left, y2=rr.top+rr.height/2-box.top;
+  const NS='http://www.w3.org/2000/svg';
+  const mx=(x1+x2)/2;
+  const path=document.createElementNS(NS,'path');
+  path.setAttribute('class','link-path');
+  path.setAttribute('d','M'+x1+' '+y1+' C '+mx+' '+y1+', '+mx+' '+y2+', '+x2+' '+y2);
+  svg.appendChild(path);
+  const len=path.getTotalLength();
+  path.style.setProperty('--len',len);
+  path.style.strokeDasharray=len;
+  [[x1,y1],[x2,y2]].forEach(([cx,cy])=>{
+    const c=document.createElementNS(NS,'circle');
+    c.setAttribute('class','link-dot');
+    c.setAttribute('cx',cx); c.setAttribute('cy',cy); c.setAttribute('r',4.5);
+    c.style.transformOrigin=cx+'px '+cy+'px';
+    svg.appendChild(c);
+  });
 }
 
 /* ============ RESULTS ============ */
