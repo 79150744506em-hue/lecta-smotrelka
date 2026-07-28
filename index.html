@@ -253,6 +253,15 @@ h1,h2,h3,.head{font-family:'Nunito',sans-serif}
 .mitem:not(.matched):active{transform:translateY(2px);box-shadow:0 2px 8px rgba(40,20,90,.14)}
 .mitem.img{padding:8px}
 .mitem.img img{max-height:44px}
+/* широкие картинки весов — им нужна колонка пошире и полная ширина карточки */
+.match-cols.wideimg #mL{flex:1.55}
+.match-cols.wideimg .mitem{flex:1;min-height:62px;font-size:13px}
+.mitem.img.wide{padding:5px}
+.mitem.img.wide img{max-height:none;width:100%;border-radius:9px;display:block}
+/* квадратные картинки предметов */
+.match-cols.objimg .mitem{flex:1}
+.mitem.img.obj{min-height:96px}
+.mitem.img.obj img{max-height:80px}
 .mitem.sel{border-color:var(--brand);box-shadow:0 0 0 4px rgba(123,97,255,.2)}
 .mitem.matched{border-color:var(--ok-ink);background:var(--ok-bg);color:var(--ok-ink);cursor:default}
 .mitem.matched.img{background:var(--ok-bg)}
@@ -476,8 +485,8 @@ h1,h2,h3,.head{font-family:'Nunito',sans-serif}
 
       <div class="page-scroll">
         <div class="theme-hero">
-          <h1>На сколько больше?<br>На сколько меньше?</h1>
-          <div class="meta">5 уроков · ~15 минут</div>
+          <h1 id="theme-title">На сколько больше?<br>На сколько меньше?</h1>
+          <div class="meta" id="theme-meta">5 уроков · ~15 минут</div>
           <div class="prog"><div class="bar"><span id="theme-bar"></span></div><div class="pct" id="theme-pct">0%</div></div>
         </div>
         <div class="lessons" id="lessons"></div>
@@ -616,6 +625,7 @@ function mascot(mood){
 
 /* ============ DATA ============ */
 const IMG='assets/img/', VID='assets/videos/';
+const IMGKG=IMG+'kg/';   // картинки заданий темы «Килограмм»
 
 /* ============ CHARACTERS ============ */
 // Когда придут ролики по персонажам — положить их в assets/videos/<slug>/lessonN.mp4
@@ -630,11 +640,17 @@ const CHARACTERS=[
 const CHAR_BY_SLUG=Object.fromEntries(CHARACTERS.map(c=>[c.slug,c]));
 let currentCharSlug='kira';
 function currentChar(){ return CHAR_BY_SLUG[currentCharSlug]||CHARACTERS[0]; }
-function videoFor(n){ return PER_CHAR_VIDEOS ? VID+currentCharSlug+'/lesson'+n+'.mp4' : VID+'lesson'+n+'.mp4'; }
+// Ролики темы «На сколько больше?» записаны каждым персонажем, «Килограмм» — общие.
+function videoFor(n){ const t=T();
+  return t.perChar ? VID+currentCharSlug+'/lesson'+n+'.mp4' : VID+t.dir+'/lesson'+n+'.mp4'; }
 function posterFor(slug,n){ return IMG+'poster/'+slug+'-'+n+'.jpg'; }
+function posterOf(n){ const t=T(); return t.perChar ? posterFor(currentCharSlug,n) : IMG+'poster/'+t.dir+'-'+n+'.jpg'; }
 
-const THEME = {
+const THEMES = [
+{ id:'more-less',
   title:'На сколько больше? На сколько меньше?',
+  titleHtml:'На сколько больше?<br>На сколько меньше?',
+  mins:15, perChar:true,
   lessons:[
     {n:1,title:'На сколько больше?',video:VID+'lesson1.mp4',sub:'Считаем, на сколько одних предметов больше',
      mech:{type:'quiz',questions:[
@@ -666,8 +682,43 @@ const THEME = {
        {img:IMG+'image14.png',q:'На сколько кошек больше?',options:['На 1 больше','На 2 больше','На 4 больше','На 5 больше'],correct:0},
        {img:IMG+'image14.png',q:'На сколько мышек меньше?',options:['На 5 меньше','На 4 меньше','На 1 меньше','Мышек больше'],correct:2},
      ]}},
-  ]
-};
+  ]},
+
+{ id:'kg',
+  title:'Килограмм',
+  titleHtml:'Килограмм',
+  mins:12, perChar:false, dir:'kg',
+  lessons:[
+    {n:1,title:'Что такое килограмм',sub:'Знакомимся с единицей измерения массы',
+     mech:{type:'quiz',questions:[
+       {q:'Что такое килограмм?',options:['Единица измерения массы','Единица измерения длины','Единица измерения времени','Единица измерения объёма'],correct:0},
+       {q:'Масса арбуза — 6 килограммов. Как это записать кратко?',options:['6 к','6 кг','6','кг 6'],correct:1,hint:'Килограмм сокращённо записывают двумя буквами — кг.'},
+       {q:'Что можно измерить в килограммах?',options:['Ширину тыквы','Вкус дыни','Массу тыквы','Цвет дыни'],correct:2},
+     ]}},
+    {n:2,title:'Как весы показывают массу',sub:'Учимся читать положение чаш весов',
+     mech:{type:'match',prompt:'Соедини каждую картинку с правильной подписью',wide:true,pairs:[
+       {left:IMGKG+'img2.jpg',limg:true,right:'Весы в равновесии'},
+       {left:IMGKG+'img3.jpg',limg:true,right:'Левая чаша ниже'},
+       {left:IMGKG+'img1.jpg',limg:true,right:'Весы пустые'},
+     ]}},
+    {n:3,title:'Как найти массу по гирям',sub:'Складываем массы гирь на весах',
+     mech:{type:'quiz',questions:[
+       {img:IMGKG+'img4.jpg',q:'Какова масса капусты?',options:['2 кг','4 кг','5 кг','7 кг'],correct:1,hint:'На правой чаше две гири по 2 кг: 2 + 2 = 4.'},
+       {img:IMGKG+'img5.jpg',q:'Какова масса арбуза?',options:['2 кг','4 кг','5 кг','10 кг'],correct:2},
+       {img:IMGKG+'img2.jpg',q:'Какова масса тыквы?',options:['4 кг','5 кг','7 кг','10 кг'],correct:2,hint:'Складываем гири: 5 + 2 = 7.'},
+     ]}},
+    {n:4,title:'Как найти массу лёгкого предмета',sub:'Считаем, если предмет легче на 1 кг',
+     mech:{type:'match',prompt:'Дыня на 1 кг легче тыквы. Соедини каждый предмет с его массой',obj:true,pairs:[
+       {left:IMGKG+'img6.jpg',limg:true,right:'7 кг'},
+       {left:IMGKG+'img7.jpg',limg:true,right:'6 кг'},
+       {left:IMGKG+'img8.jpg',limg:true,right:'5 кг'},
+     ]}},
+  ]},
+];
+let curTheme=0;
+function T(){ return THEMES[curTheme]; }
+function plural(n,a,b,c){ const m=n%100,d=n%10; return (m>=11&&m<=14)?c:(d===1?a:(d>=2&&d<=4?b:c)); }
+function themeSub(t){ return t.lessons.length+' '+plural(t.lessons.length,'урок','урока','уроков')+' · ~'+t.mins+' минут'; }
 // extra decorative themes for realism
 const DUMMY=[
   {title:'Подготовка к изучению чисел',sub:'6 уроков · ~18 минут'},
@@ -677,9 +728,14 @@ const DUMMY=[
 ];
 
 /* ============ STATE ============ */
-let state = { done:[false,false,false,false,false], filterClass:'1 класс', filterSubject:'Математика', curLesson:0, sheet:null, sheetPick:null };
-function doneCount(){return state.done.filter(Boolean).length}
-function firstUndone(){for(let i=0;i<5;i++)if(!state.done[i])return i;return -1}
+let state = { progress:{}, filterClass:'1 класс', filterSubject:'Математика', curLesson:0, sheet:null, sheetPick:null };
+THEMES.forEach(t=>state.progress[t.id]=new Array(t.lessons.length).fill(false));
+// без аргумента — текущая тема, с индексом — конкретная (для списка тем)
+function doneArr(i){ return state.progress[THEMES[i===undefined?curTheme:i].id]; }
+function doneCount(i){ return doneArr(i).filter(Boolean).length }
+function lessonTotal(i){ return doneArr(i).length }
+function firstUndone(){ const a=doneArr(); for(let i=0;i<a.length;i++) if(!a[i]) return i; return -1 }
+function firstUnfinishedTheme(){ for(let i=0;i<THEMES.length;i++) if(progressPct(i)<100) return i; return -1 }
 function hasContent(){return state.filterClass==='1 класс' && state.filterSubject==='Математика'}
 
 /* ============ NAV ============ */
@@ -696,21 +752,23 @@ function enterSmotrelka(){ renderMain(); go('screen-main'); }
 function renderMain(){
   // continue button label
   const cb=document.getElementById('continue-label');
-  const anyStarted=doneCount()>0;
-  document.getElementById('continue-btn').style.display = (hasContent()&&firstUndone()>=0)?'flex':'none';
+  const anyStarted=THEMES.some((t,i)=>doneCount(i)>0);
+  document.getElementById('continue-btn').style.display = (hasContent()&&firstUnfinishedTheme()>=0)?'flex':'none';
   cb.textContent = anyStarted?'Продолжить':'Смотреть все подряд';
   const list=document.getElementById('theme-list');
   if(!hasContent()){
     list.innerHTML='<div class="empty"><div class="em">🔍</div><h3>Темы скоро появятся</h3><p>Для «'+state.filterSubject+', '+state.filterClass+'» контент ещё готовится. Выберите «Математика, 1 класс».</p></div>';
     return;
   }
-  list.innerHTML = themeCard(THEME.title,'5 уроков · ~15 минут',progressPct(),statusOf()) + DUMMY.map(d=>themeCard(d.title,d.sub,0,'new',true)).join('');
-  // bind first card
-  list.firstElementChild.onclick=openTheme;
-  [...list.children].slice(1).forEach(c=>c.onclick=()=>toast('Демо-тема доступна: «На сколько больше?»'));
+  list.innerHTML = THEMES.map((t,i)=>themeCard(t.title,themeSub(t),progressPct(i),statusOf(i))).join('')
+    + DUMMY.map(d=>themeCard(d.title,d.sub,0,'new',true)).join('');
+  [...list.children].forEach((c,i)=>{
+    c.onclick = i<THEMES.length ? (()=>openTheme(i))
+      : (()=>toast('Демо-тема. Доступны «На сколько больше?» и «Килограмм»'));
+  });
 }
-function progressPct(){return Math.round(doneCount()/5*100)}
-function statusOf(){const p=progressPct();return p===0?'new':p===100?'done':'started'}
+function progressPct(i){ const a=doneArr(i); return Math.round(a.filter(Boolean).length/a.length*100) }
+function statusOf(i){const p=progressPct(i);return p===0?'new':p===100?'done':'started'}
 function themeCard(title,sub,pct,status,dummy){
   const icClass = status==='done'?'done':status==='started'?'started':'';
   const star = status==='done'
@@ -723,7 +781,7 @@ function themeCard(title,sub,pct,status,dummy){
     +'<span class="go"><svg width="9" height="15" viewBox="0 0 10 16"><path d="M2 2l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
     +'</div>';
 }
-function continueMain(){ openTheme(); setTimeout(()=>{const i=firstUndone(); startLesson(i<0?0:i);},80); }
+function continueMain(){ const t=firstUnfinishedTheme(); openTheme(t<0?0:t); setTimeout(()=>{const i=firstUndone(); startLesson(i<0?0:i);},80); }
 
 /* ============ SHEETS (filters) ============ */
 const CLASSES=['1 класс','2 класс','3 класс','4 класс'];
@@ -753,16 +811,19 @@ function closeScrim(){document.getElementById('scrim').classList.remove('show');
 document.getElementById('scrim').addEventListener('click',e=>{if(e.target.id==='scrim')closeScrim();});
 
 /* ============ THEME ============ */
-function openTheme(){ renderTheme(); go('screen-theme'); }
+function openTheme(i){ if(typeof i==='number') curTheme=i; renderTheme(); go('screen-theme'); }
 function renderTheme(){
+  const t=T();
+  document.getElementById('theme-title').innerHTML=t.titleHtml;
+  document.getElementById('theme-meta').textContent=themeSub(t);
   document.getElementById('theme-bar').style.width=progressPct()+'%';
   document.getElementById('theme-pct').textContent=progressPct()+'%';
   const el=document.getElementById('lessons');
-  el.innerHTML=THEME.lessons.map((l,i)=>{
-    const done=state.done[i];
+  el.innerHTML=t.lessons.map((l,i)=>{
+    const done=doneArr()[i];
     return '<div class="lesson'+(done?' done':'')+'" onclick="startLesson('+i+')">'
       +'<div class="lvid"><span class="num">'+l.n+'</span>'
-        +'<img src="'+posterFor(currentCharSlug,l.n)+'" alt="" loading="lazy">'
+        +'<img src="'+posterOf(l.n)+'" alt="" loading="lazy">'
         +'<div class="play"><svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="rgba(0,0,0,.35)"/><path d="M10 8.5v7l5.5-3.5L10 8.5Z" fill="#fff"/></svg></div>'
         +'<div class="lok"><svg width="30" height="30" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#2E9E52"/><path d="M7 12.5 10.5 16 17 8.5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'
       +'</div>'
@@ -797,10 +858,10 @@ function toggleVideoTap(){
 
 function startLesson(i){
   state.curLesson=i;
-  const l=THEME.lessons[i];
+  const l=T().lessons[i];
   const pl=document.getElementById('player');
   pl.src=videoFor(l.n); pl.currentTime=0; pl.muted=!soundOn;
-  document.getElementById('vblur').src=posterFor(currentCharSlug,l.n);
+  document.getElementById('vblur').src=posterOf(l.n);
   document.getElementById('vtitle').textContent='Урок '+l.n+'. '+l.title;
   document.getElementById('vbar').style.width='0%';
   document.getElementById('swipe-hint').classList.remove('show');
@@ -875,7 +936,7 @@ function goGame(){
   document.getElementById('swipe-hint').classList.remove('show');
   const pl=document.getElementById('player'); try{pl.pause();}catch(e){}
   clearInterval(videoTimers.bar); clearTimeout(videoTimers.hint);
-  const l=THEME.lessons[state.curLesson];
+  const l=T().lessons[state.curLesson];
   game={mech:l.mech, step:0, total: l.mech.type==='quiz'?l.mech.questions.length:l.mech.pairs.length, matched:0, sel:null};
   go('screen-game');
   // countdown intro
@@ -971,16 +1032,20 @@ function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor
 function renderMatch(){
   const m=game.mech;
   const area=document.getElementById('garea');
-  const lefts=m.pairs.map((p,i)=>({t:p.left,idx:i}));
+  const lefts=m.pairs.map((p,i)=>({t:p.left,idx:i,img:!!p.limg}));
   const rights=shuffle(m.pairs.map((p,i)=>({t:p.right,idx:i,img:!!p.img})));
   game.matched=0; game.sel=null;
+  // wide — широкие картинки (весы), obj — квадратные предметы
+  const sz=m.wide?' wide':(m.obj?' obj':'');
+  const cell=(o,side)=>'<div class="mitem'+(o.img?' img'+sz:'')+'" data-side="'+side+'" data-idx="'+o.idx+'">'
+    +(o.img?'<img src="'+o.t+'" alt="">':o.t)+'</div>';
   let html='<div class="qbubble"><div class="m">'+mascot('happy')+'</div><div class="qt">'+m.prompt+'</div></div>';
   html+='<div class="qmid">';
   if(m.legend) html+='<div class="match-legend"><img src="'+m.legend+'"></div>';
-  html+='<div class="match-cols"><svg class="match-links" id="mSvg"></svg><div class="mcol" id="mL">'
-    +lefts.map(l=>'<div class="mitem" data-side="L" data-idx="'+l.idx+'">'+l.t+'</div>').join('')
+  html+='<div class="match-cols'+(m.wide?' wideimg':'')+(m.obj?' objimg':'')+'"><svg class="match-links" id="mSvg"></svg><div class="mcol" id="mL">'
+    +lefts.map(l=>cell(l,'L')).join('')
     +'</div><div class="mcol" id="mR">'
-    +rights.map(r=>'<div class="mitem '+(r.img?'img':'')+'" data-side="R" data-idx="'+r.idx+'">'+(r.img?'<img src="'+r.t+'">':r.t)+'</div>').join('')
+    +rights.map(r=>cell(r,'R')).join('')
     +'</div></div>';
   html+='</div>';
   area.innerHTML=html;
@@ -1039,8 +1104,8 @@ function drawLink(a,b){
 
 /* ============ RESULTS ============ */
 function finishGame(){
-  state.done[state.curLesson]=true;
-  if(doneCount()>=5){ showFinal(); }
+  doneArr()[state.curLesson]=true;
+  if(doneCount()>=lessonTotal()){ showFinal(); }
   else { showInter(); }
 }
 function confetti(host,n){
@@ -1052,11 +1117,11 @@ function confetti(host,n){
 }
 function showInter(){
   const m=document.getElementById('modal'), b=document.getElementById('modal-body');
-  const next=THEME.lessons[state.curLesson+1];
+  const next=T().lessons[state.curLesson+1];
   b.innerHTML='<div class="result"><div class="m">'+mascot('happy')+'</div>'
-    +'<h2>Урок пройден!</h2><p>Отлично! Ты закрыл(а) «'+THEME.lessons[state.curLesson].title+'».</p>'
+    +'<h2>Урок пройден!</h2><p>Отлично! Ты закрыл(а) «'+T().lessons[state.curLesson].title+'».</p>'
     +'<div class="prog"><div class="bar" style="height:8px;border-radius:6px;background:#EDEBF2;overflow:hidden"><span style="display:block;height:100%;background:var(--grad);width:'+progressPct()+'%"></span></div></div>'
-    +'<p style="margin-top:8px;font-weight:700;color:var(--brand-ink)">'+doneCount()+' из 5 уроков темы</p>'
+    +'<p style="margin-top:8px;font-weight:700;color:var(--brand-ink)">'+doneCount()+' из '+lessonTotal()+' уроков темы</p>'
     +'<div class="btns"><button class="btn btn-primary" onclick="closeModal();startLesson('+(state.curLesson+1)+')">Продолжить'+(next?' · Урок '+next.n:'')+'</button>'
     +'<button class="btn btn-ghost" onclick="closeModal();go(\'screen-theme\');renderTheme()">Выйти</button></div></div>';
   m.classList.add('show');
@@ -1066,7 +1131,7 @@ function showFinal(){
   const m=document.getElementById('modal'), b=document.getElementById('modal-body');
   b.innerHTML='<div class="result final"><div class="glow"></div><div class="m">'+mascot('happy')+'</div>'
     +'<div class="stars"><svg class="star" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.1l1-5.8-4.3-4.1 5.9-.9L12 3Z"/></svg><svg class="star" width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.1l1-5.8-4.3-4.1 5.9-.9L12 3Z"/></svg><svg class="star" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.1l1-5.8-4.3-4.1 5.9-.9L12 3Z"/></svg></div>'
-    +'<h2>Тема пройдена! 🎉</h2><p>Все 5 уроков темы «На сколько больше? На сколько меньше?» завершены. Ты молодец!</p>'
+    +'<h2>Тема пройдена! 🎉</h2><p>Все '+lessonTotal()+' '+plural(lessonTotal(),'урок','урока','уроков')+' темы «'+T().title+'» завершены. Ты молодец!</p>'
     +'<div class="btns"><button class="btn btn-primary" onclick="closeModal();enterSmotrelka()">На главную</button>'
     +'<button class="btn btn-ghost" onclick="resetProgress();closeModal();openTheme()">Пройти тему заново</button></div></div>';
   m.classList.add('show');
@@ -1074,18 +1139,18 @@ function showFinal(){
 }
 function closeModal(){document.getElementById('modal').classList.remove('show');document.getElementById('modal-body').innerHTML='';}
 function exitGame(){ go('screen-theme'); renderTheme(); }
-function resetProgress(){ state.done=[false,false,false,false,false]; }
+function resetProgress(){ state.progress[T().id]=new Array(T().lessons.length).fill(false); }
 
 /* ============ SEARCH ============ */
 function openSearch(){ go('screen-search'); document.getElementById('search-input').value=''; runSearch(''); setTimeout(()=>document.getElementById('search-input').focus(),100); }
 function closeSearch(){ go('screen-main'); }
 function runSearch(q){
   const res=document.getElementById('search-results');
-  const all=[{title:THEME.title,sub:'5 уроков · ~15 минут',real:true},...DUMMY];
+  const all=[...THEMES.map((t,i)=>({title:t.title,sub:themeSub(t),real:true,idx:i})),...DUMMY];
   const f=all.filter(t=>t.title.toLowerCase().includes(q.trim().toLowerCase()));
   if(!f.length){res.innerHTML='<div class="empty"><div class="em">🔍</div><h3>Ничего не найдено</h3><p>Попробуйте изменить запрос</p></div>';return;}
-  res.innerHTML=f.map(t=>themeCard(t.title,t.sub,t.real?progressPct():0,t.real?statusOf():'new',!t.real)).join('');
-  [...res.children].forEach((c,i)=>{ c.onclick=()=> f[i].real?(closeSearch(),openTheme()):toast('Демо-тема: «На сколько больше?»'); });
+  res.innerHTML=f.map(t=>themeCard(t.title,t.sub,t.real?progressPct(t.idx):0,t.real?statusOf(t.idx):'new',!t.real)).join('');
+  [...res.children].forEach((c,i)=>{ c.onclick=()=> f[i].real?(closeSearch(),openTheme(f[i].idx)):toast('Демо-тема. Доступны «На сколько больше?» и «Килограмм»'); });
 }
 
 /* ============ TOAST ============ */
