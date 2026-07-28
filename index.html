@@ -411,7 +411,7 @@ h1,h2,h3,.head{font-family:'Nunito',sans-serif}
           <div class="blob"></div>
         </div>
         <div class="sec-title"><h2>Новинки</h2><a onclick="toast('Все новинки')">Все</a></div>
-        <div class="hstrip"><img src="assets/img/novinki.jpg" alt="Новинки: Математика, Обществознание, Информатика" onclick="toast('Карточка товара')"></div>
+        <div class="hstrip"><img src="assets/img/novinki.jpg?v=2" alt="Новинки: Математика, Обществознание, Информатика" onclick="toast('Карточка товара')"></div>
         <div style="height:20px"></div>
       </div>
 
@@ -626,6 +626,10 @@ function mascot(mood){
 /* ============ DATA ============ */
 const IMG='assets/img/', VID='assets/videos/';
 const IMGKG=IMG+'kg/';   // картинки заданий темы «Килограмм»
+// Ассеты на проде кэшируются на сутки, а имена файлов не меняются. Чтобы после
+// замены ролика/картинки браузер не отдавал старую версию — бампни ASSET_V.
+const ASSET_V='2';
+function av(u){ return u+(u.indexOf('?')<0?'?':'&')+'v='+ASSET_V; }
 
 /* ============ CHARACTERS ============ */
 // Когда придут ролики по персонажам — положить их в assets/videos/<slug>/lessonN.mp4
@@ -642,9 +646,9 @@ let currentCharSlug='kira';
 function currentChar(){ return CHAR_BY_SLUG[currentCharSlug]||CHARACTERS[0]; }
 // Ролики темы «На сколько больше?» записаны каждым персонажем, «Килограмм» — общие.
 function videoFor(n){ const t=T();
-  return t.perChar ? VID+currentCharSlug+'/lesson'+n+'.mp4' : VID+t.dir+'/lesson'+n+'.mp4'; }
-function posterFor(slug,n){ return IMG+'poster/'+slug+'-'+n+'.jpg'; }
-function posterOf(n){ const t=T(); return t.perChar ? posterFor(currentCharSlug,n) : IMG+'poster/'+t.dir+'-'+n+'.jpg'; }
+  return av(t.perChar ? VID+currentCharSlug+'/lesson'+n+'.mp4' : VID+t.dir+'/lesson'+n+'.mp4'); }
+function posterFor(slug,n){ return av(IMG+'poster/'+slug+'-'+n+'.jpg'); }
+function posterOf(n){ const t=T(); return t.perChar ? posterFor(currentCharSlug,n) : av(IMG+'poster/'+t.dir+'-'+n+'.jpg'); }
 
 const THEMES = [
 { id:'more-less',
@@ -965,9 +969,9 @@ function renderQuiz(){
   const area=document.getElementById('garea');
   let html='<div class="qbubble"><div class="m">'+mascot('happy')+'</div><div class="qt">'+q.q+'</div></div>';
   html+='<div class="qmid">';
-  if(q.img) html+='<div class="qimg"><img src="'+q.img+'"></div>';
+  if(q.img) html+='<div class="qimg"><img src="'+av(q.img)+'"></div>';
   if(q.imgOptions){
-    html+='<div class="answers">'+q.imgOptions.map((src,i)=>'<button class="ans img-ans" data-i="'+i+'" onclick="answer('+i+')"><img src="'+src+'"></button>').join('')+'</div>';
+    html+='<div class="answers">'+q.imgOptions.map((src,i)=>'<button class="ans img-ans" data-i="'+i+'" onclick="answer('+i+')"><img src="'+av(src)+'"></button>').join('')+'</div>';
   }else{
     html+='<div class="answers">'+q.options.map((o,i)=>'<button class="ans" data-i="'+i+'" onclick="answer('+i+')">'+o+'</button>').join('')+'</div>';
   }
@@ -1038,10 +1042,10 @@ function renderMatch(){
   // wide — широкие картинки (весы), obj — квадратные предметы
   const sz=m.wide?' wide':(m.obj?' obj':'');
   const cell=(o,side)=>'<div class="mitem'+(o.img?' img'+sz:'')+'" data-side="'+side+'" data-idx="'+o.idx+'">'
-    +(o.img?'<img src="'+o.t+'" alt="">':o.t)+'</div>';
+    +(o.img?'<img src="'+av(o.t)+'" alt="">':o.t)+'</div>';
   let html='<div class="qbubble"><div class="m">'+mascot('happy')+'</div><div class="qt">'+m.prompt+'</div></div>';
   html+='<div class="qmid">';
-  if(m.legend) html+='<div class="match-legend"><img src="'+m.legend+'"></div>';
+  if(m.legend) html+='<div class="match-legend"><img src="'+av(m.legend)+'"></div>';
   html+='<div class="match-cols'+(m.wide?' wideimg':'')+(m.obj?' objimg':'')+'"><svg class="match-links" id="mSvg"></svg><div class="mcol" id="mL">'
     +lefts.map(l=>cell(l,'L')).join('')
     +'</div><div class="mcol" id="mR">'
