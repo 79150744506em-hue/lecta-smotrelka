@@ -358,7 +358,7 @@ h1,h2,h3,.head{font-family:'Nunito',sans-serif}
 .cs-card:hover{background:rgba(255,255,255,.12);transform:translateY(-3px)}
 .cs-card:active{transform:scale(.97)}
 .cs-av{position:relative;width:78px;height:78px;border-radius:50%;overflow:hidden;box-shadow:0 12px 26px rgba(0,0,0,.42);animation:floatM 3s ease-in-out infinite}
-.cs-av video,.cs-av img{width:100%;height:100%;object-fit:cover;object-position:50% 8%;display:block}
+.cs-av video,.cs-av img{width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block}
 .cs-badge{position:absolute;bottom:0;left:50%;transform:translateX(-50%);background:rgba(20,12,40,.82);color:#fff;font-family:'Nunito';font-weight:800;font-size:8.5px;letter-spacing:.4px;text-transform:uppercase;padding:2px 7px;border-radius:8px 8px 0 0}
 .cs-card:nth-child(2) .cs-av{animation-delay:.4s}.cs-card:nth-child(3) .cs-av{animation-delay:.8s}.cs-card:nth-child(4) .cs-av{animation-delay:1.2s}.cs-card:nth-child(5) .cs-av{animation-delay:1.6s}
 .cs-name{font-family:'Nunito';font-weight:800;font-size:16px;color:#fff}
@@ -366,7 +366,7 @@ h1,h2,h3,.head{font-family:'Nunito',sans-serif}
 .cs-note{margin-top:auto;padding-top:24px;color:#8f89a8;font-size:12px;text-align:center;line-height:1.5}
 .cs-note b{color:#BBA6FF;font-family:'Nunito'}
 .char-chip{width:42px;height:42px;border-radius:50%;border:2px solid #fff;cursor:pointer;overflow:hidden;padding:0;box-shadow:0 6px 14px rgba(0,0,0,.16);background:var(--brand)}
-.char-chip video,.char-chip img{width:100%;height:100%;object-fit:cover;object-position:50% 8%;display:block}
+.char-chip video,.char-chip img{width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block}
 
 /* ===== адаптив: на телефоне — на весь экран, без рамки-мокапа ===== */
 /* На телефонах — полноэкранный адаптив без мокапа телефона (порог 480px) */
@@ -637,6 +637,8 @@ function videoFor(n){ const t=T();
   return av(t.perChar ? VID+currentCharSlug+'/lesson'+n+'.mp4' : VID+t.dir+'/lesson'+n+'.mp4'); }
 function posterFor(slug,n){ return av(IMG+'poster/'+slug+'-'+n+'.jpg'); }
 function posterOf(n){ const t=T(); return t.perChar ? posterFor(currentCharSlug,n) : av(IMG+'poster/'+t.dir+'-'+n+'.jpg'); }
+// портрет персонажа для круглых аватарок (обрезан по лицу)
+function charPhoto(slug){ return av(IMG+'char/'+slug+'.jpg'); }
 
 const THEMES = [
 { id:'more-less',
@@ -1185,11 +1187,11 @@ function renderCharSelect(){
   document.getElementById('cs-mascot').innerHTML=mascot('happy');
   document.getElementById('cs-grid').innerHTML=CHARACTERS.map(c=>
     '<div class="cs-card" onclick="selectCharacter(\''+c.slug+'\')">'
-    +'<div class="cs-av" style="background:linear-gradient(135deg,'+c.g[0]+','+c.g[1]+')"><img src="'+posterFor(c.slug,1)+'" alt="">'+(c.mascot?'<span class="cs-badge">маскот</span>':'')+'</div>'
+    +'<div class="cs-av" style="background:linear-gradient(135deg,'+c.g[0]+','+c.g[1]+')"><img src="'+charPhoto(c.slug)+'" alt="">'+(c.mascot?'<span class="cs-badge">маскот</span>':'')+'</div>'
     +'<div class="cs-name">'+c.name+'</div><div class="cs-tag">'+c.tag+'</div></div>').join('');
   const cl=document.getElementById('cs-link'); if(cl) cl.textContent='/'+currentCharSlug;
 }
-function updateCharAvatar(){ const c=currentChar(); const el=document.getElementById('charAvatar'); if(el){ el.style.background='linear-gradient(135deg,'+c.g[0]+','+c.g[1]+')'; el.innerHTML='<img src="'+posterFor(c.slug,1)+'" alt="">'; } }
+function updateCharAvatar(){ const c=currentChar(); const el=document.getElementById('charAvatar'); if(el){ el.style.background='linear-gradient(135deg,'+c.g[0]+','+c.g[1]+')'; el.innerHTML='<img src="'+charPhoto(c.slug)+'" alt="">'; } }
 function openCharSelect(){ renderCharSelect(); go('screen-charselect'); }
 function selectCharacter(slug){
   if(!CHAR_BY_SLUG[slug]) return;
